@@ -15,7 +15,8 @@
   "bugs": {
     "url": "https://github.com/D34DPlayer/w-orm/issues"
   },
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist/**/*"
   ],
@@ -26,12 +27,21 @@
     "prepare": "pnpm build",
     "prepublishOnly": "pnpm lint",
     "preversion": "pnpm lint",
-    "version": "npm run format && git add -A src",
+    "version": "pnpm lint:fix && git add -A src",
     "postversion": "git push && git push --tags"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.37.0",
+    "@typescript/lib-dom": "npm:@types/web@^0.0.99",
     "eslint": "^8.36.0",
+    "lint-staged": "^13.2.0",
+    "simple-git-hooks": "^2.8.1",
     "typescript": "^5.0.2"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "lint-staged": {
+    "*": "eslint . --fix"
   }
 }
