@@ -2,13 +2,33 @@
   "name": "w-orm",
   "version": "0.1.0",
   "description": "IndexedDB ORM",
+  "author": {
+    "name": "D34DPlayer",
+    "email": "carlos@d34d.one"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/D34DPlayer/w-orm#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/D34DPlayer/w-orm.git"
+  },
+  "bugs": {
+    "url": "https://github.com/D34DPlayer/w-orm/issues"
+  },
   "main": "index.js",
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "build": "tsc",
+    "prepare": "pnpm build",
+    "prepublishOnly": "pnpm lint",
+    "preversion": "pnpm lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
   },
-  "author": "Carlos Ruiz <carlos@d34d.one>",
-  "license": "MIT",
   "devDependencies": {
     "@antfu/eslint-config": "^0.37.0",
     "eslint": "^8.36.0",

@@ -1,15 +1,16 @@
 {
-    "compilerOptions": {
-        "module": "ES6",
-        "target": "ES5",
-        "lib": [
-            "ES2020"
-        ],
-        "declaration": true,
-        "outDir": "./dist/lib/es6",
-        "moduleResolution": "node"
-    },
-    "include": [
-        "src/**/*"
-    ]
+  "compilerOptions": {
+    "module": "ES6",
+    "target": "ES5",
+    "lib": [
+      "ES2020"
+    ],
+    "declaration": true,
+    "outDir": "./dist",
+    "strict": true,
+    "moduleResolution": "node16"
+  },
+  "include": [
+    "src/**/*"
+  ]
 }
