@@ -28,13 +28,16 @@
     "prepublishOnly": "pnpm lint",
     "preversion": "pnpm lint",
     "version": "pnpm lint:fix && git add -A src",
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "dev": "tsc --watch",
+    "dev:serve": "serve ."
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.37.0",
     "@typescript/lib-dom": "npm:@types/web@^0.0.99",
     "eslint": "^8.36.0",
     "lint-staged": "^13.2.0",
+    "serve": "^14.2.0",
     "simple-git-hooks": "^2.8.1",
     "typescript": "^5.0.2"
   },
