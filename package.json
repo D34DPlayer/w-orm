@@ -1,0 +1,17 @@
+{
+  "name": "w-orm",
+  "version": "0.1.0",
+  "description": "IndexedDB ORM",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "author": "Carlos Ruiz <carlos@d34d.one>",
+  "license": "MIT",
+  "devDependencies": {
+    "@antfu/eslint-config": "^0.37.0",
+    "eslint": "^8.36.0",
+    "typescript": "^5.0.2"
+  }
+}
