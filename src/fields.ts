@@ -1,4 +1,4 @@
-import { addFieldToMetadata } from './metadata.js'
+import { addFieldToMetadata } from './metadata'
 
 export interface FieldOptions<T> {
   primaryKey: boolean

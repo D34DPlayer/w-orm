@@ -1,4 +1,4 @@
-import { createTables } from './metadata.js'
+import { createTables } from './metadata'
 
 interface DisconnectedDB {
   connected: false

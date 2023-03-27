@@ -1,5 +1,5 @@
-import type { FieldOptions } from './fields.js'
-import { db } from './connection.js'
+import type { FieldOptions } from './fields'
+import { db } from './connection'
 
 interface TableMetadata {
   [fieldName: string]: FieldOptions<any>

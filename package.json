@@ -15,30 +15,44 @@
   "bugs": {
     "url": "https://github.com/D34DPlayer/w-orm/issues"
   },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/index.umd.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/types/index.d.ts",
+  "type": "module",
   "files": [
     "dist/**/*"
   ],
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "build": "tsc",
+    "prebuild": "rimraf dist",
+    "build": "tsc --module commonjs && rollup -c rollup.config.js",
+    "start": "rollup -c rollup.config.js -w",
+    "serve": "serve .",
     "prepare": "pnpm build",
     "prepublishOnly": "pnpm lint",
     "preversion": "pnpm lint",
     "version": "pnpm lint:fix && git add -A src",
-    "postversion": "git push && git push --tags",
-    "dev": "tsc --watch",
-    "dev:serve": "serve ."
+    "postversion": "git push && git push --tags"
+  },
+  "dependencies": {
+    "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.37.0",
+    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@types/node": "^18.15.10",
     "@typescript/lib-dom": "npm:@types/web@^0.0.99",
     "eslint": "^8.36.0",
     "lint-staged": "^13.2.0",
+    "rimraf": "^4.4.1",
+    "rollup": "^3.20.2",
     "serve": "^14.2.0",
     "simple-git-hooks": "^2.8.1",
+    "tslib": "^2.5.0",
     "typescript": "^5.0.2"
   },
   "simple-git-hooks": {
@@ -46,8 +60,5 @@
   },
   "lint-staged": {
     "*": "eslint . --fix"
-  },
-  "dependencies": {
-    "reflect-metadata": "^0.1.13"
   }
 }
