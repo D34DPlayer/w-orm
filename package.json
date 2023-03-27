@@ -46,5 +46,8 @@
   },
   "lint-staged": {
     "*": "eslint . --fix"
+  },
+  "dependencies": {
+    "reflect-metadata": "^0.1.13"
   }
 }

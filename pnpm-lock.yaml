@@ -5,9 +5,13 @@ specifiers:
   '@typescript/lib-dom': npm:@types/web@^0.0.99
   eslint: ^8.36.0
   lint-staged: ^13.2.0
+  reflect-metadata: ^0.1.13
   serve: ^14.2.0
   simple-git-hooks: ^2.8.1
   typescript: ^5.0.2
+
+dependencies:
+  reflect-metadata: 0.1.13
 
 devDependencies:
   '@antfu/eslint-config': 0.37.0_j4766f7ecgqbon3u7zlxn5zszu
@@ -2453,6 +2457,10 @@ packages:
       parse-json: 5.2.0
       type-fest: 0.6.0
     dev: true
+
+  /reflect-metadata/0.1.13:
+    resolution: {integrity: sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==}
+    dev: false
 
   /regexp-tree/0.1.24:
     resolution: {integrity: sha512-s2aEVuLhvnVJW6s/iPgEGK6R+/xngd2jNQ+xy4bXNDKxZKJH6jpPHY6kVeVv1IeLCHgswRj+Kl3ELaDjG6V1iw==}
