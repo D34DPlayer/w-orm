@@ -4,7 +4,8 @@
   "description": "IndexedDB ORM",
   "author": {
     "name": "D34DPlayer",
-    "email": "carlos@d34d.one"
+    "email": "carlos@d34d.one",
+    "url": "https://github.com/D34DPlayer"
   },
   "license": "MIT",
   "homepage": "https://github.com/D34DPlayer/w-orm#readme",
@@ -28,7 +29,7 @@
     "prebuild": "rimraf dist",
     "build:lib": "tsc --module commonjs",
     "build:dist": "rollup -c rollup.config.js",
-    "build:docs": "rimraf docs && typedoc --out docs src",
+    "build:docs": "typedoc",
     "build": "pnpm build:lib && pnpm build:dist && pnpm build:docs",
     "start": "rollup -c rollup.config.js -w",
     "serve": "serve .",
@@ -36,8 +37,7 @@
     "prepublishOnly": "pnpm lint",
     "preversion": "pnpm lint",
     "version": "pnpm lint:fix && git add -A src",
-    "postversion": "git push && git push --tags",
-    "deploy:docs": "pnpm build:docs && node .github/gh-pages-publish.mjs"
+    "postversion": "git push && git push --tags"
   },
   "dependencies": {
     "reflect-metadata": "^0.1.13"
@@ -59,6 +59,7 @@
     "simple-git-hooks": "^2.8.1",
     "tslib": "^2.5.0",
     "typedoc": "^0.23.28",
+    "typedoc-theme-yaf": "^0.0.4",
     "typescript": "^5.0.2"
   },
   "simple-git-hooks": {
