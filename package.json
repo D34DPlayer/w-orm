@@ -26,7 +26,10 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prebuild": "rimraf dist",
-    "build": "tsc --module commonjs && rollup -c rollup.config.js",
+    "build:lib": "tsc --module commonjs",
+    "build:dist": "rollup -c rollup.config.js",
+    "build:doc": "typedoc --out docs src",
+    "build": "pnpm build:lib && pnpm build:dist && pnpm build:doc",
     "start": "rollup -c rollup.config.js -w",
     "serve": "serve .",
     "prepare": "pnpm build",
@@ -53,6 +56,7 @@
     "serve": "^14.2.0",
     "simple-git-hooks": "^2.8.1",
     "tslib": "^2.5.0",
+    "typedoc": "^0.23.28",
     "typescript": "^5.0.2"
   },
   "simple-git-hooks": {
