@@ -1,7 +1,7 @@
 import type { FieldOptions } from './fields'
 import { db } from './connection'
 
-interface TableMetadata {
+export interface TableMetadata {
   [fieldName: string]: FieldOptions<any>
 }
 

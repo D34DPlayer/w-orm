@@ -3,6 +3,7 @@ import { addFieldToMetadata } from './metadata'
 export interface FieldOptions<T> {
   primaryKey: boolean
   unique: boolean
+  nullable: boolean
   default?: T | (() => T)
   type: () => T
 }
@@ -17,6 +18,7 @@ export function Field<T>(options: Partial<FieldOptions<T>> = {}): PropertyDecora
     const newOptions: FieldOptions<T> = {
       primaryKey: false,
       unique: false,
+      nullable: true,
       type,
       ...options,
     }

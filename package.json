@@ -28,15 +28,16 @@
     "prebuild": "rimraf dist",
     "build:lib": "tsc --module commonjs",
     "build:dist": "rollup -c rollup.config.js",
-    "build:doc": "typedoc --out docs src",
-    "build": "pnpm build:lib && pnpm build:dist && pnpm build:doc",
+    "build:docs": "rimraf docs && typedoc --out docs src",
+    "build": "pnpm build:lib && pnpm build:dist && pnpm build:docs",
     "start": "rollup -c rollup.config.js -w",
     "serve": "serve .",
     "prepare": "pnpm build",
     "prepublishOnly": "pnpm lint",
     "preversion": "pnpm lint",
     "version": "pnpm lint:fix && git add -A src",
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "deploy:docs": "pnpm build:docs && node .github/gh-pages-publish.mjs"
   },
   "dependencies": {
     "reflect-metadata": "^0.1.13"
@@ -54,6 +55,7 @@
     "rimraf": "^4.4.1",
     "rollup": "^3.20.2",
     "serve": "^14.2.0",
+    "shelljs": "^0.8.5",
     "simple-git-hooks": "^2.8.1",
     "tslib": "^2.5.0",
     "typedoc": "^0.23.28",

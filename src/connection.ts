@@ -1,17 +1,17 @@
 import { createTables } from './metadata'
 
-interface DisconnectedDB {
+export interface DisconnectedDB {
   connected: false
 }
 
-interface ConnectedDB {
+export interface ConnectedDB {
   connected: true
   session: IDBDatabase
   name: string
   version: number
 }
 
-type DB = DisconnectedDB | ConnectedDB
+export type DB = DisconnectedDB | ConnectedDB
 
 // TODO: Add support for multiple databases
 export const db: DB = {
