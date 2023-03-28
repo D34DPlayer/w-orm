@@ -42,12 +42,10 @@ jobs:
               uses: actions/setup-node@v3
               with:
                   node-version: 16.x
-                  cache: 'npm'
-            - run: npm ci
-            - run: npm run build # set up 'build' script in your package.json
+                  cache: 'pnpm'
 
-            - name: Build documents
-              run: npm run docs #set up 'docs' build script in your package.json
+            - name: Build everything (including docs)
+              run: npm run build
 
             - name: tar the new docs
               run: tar -cvf newdocumentation.tar ./docs
