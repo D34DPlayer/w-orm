@@ -42,11 +42,13 @@ jobs:
         with:
           version: 7.30.3
 
-      - name: Build
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: 18.x
+          node-version-file: ".nvmrc"
           cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Build everything (including docs)
         run: pnpm run build
