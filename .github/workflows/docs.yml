@@ -82,6 +82,6 @@ jobs:
         run: |
           git config --global user.email "username@users.noreply.github.com"
           git config --global user.name "Continuous Integration"
-          git add .
+          git add ./docs
           git commit -m "CI updated the documentation"
           git push
