@@ -1,12 +1,11 @@
-import 'reflect-metadata'
 import 'fake-indexeddb/auto'
-import { test, expect } from '@jest/globals'
-import { Model, Field, deleteDB, init, TablesMetadata } from '../src'
+import { expect, test } from '@jest/globals'
+import { Field, Model, TablesMetadata, deleteDB, init } from '../src'
 
 enum UserRole {
-    Admin,
-    Moderator,
-    Guest,
+  Admin,
+  Moderator,
+  Guest,
 }
 
 class User extends Model {
@@ -26,8 +25,7 @@ class User extends Model {
   balance!: number
 }
 
-
-test("Test example usage", async () => {
+test('Test example usage', async () => {
   await deleteDB('test').catch(console.error)
   const db = await init('test', 1).catch(console.error)
   console.log(TablesMetadata)

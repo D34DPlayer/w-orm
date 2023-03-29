@@ -1,34 +1,34 @@
+const url = require('node:url')
 const pkg = require('./package.json')
-const url = require('url')
 
 let repoUrl
-if (typeof pkg.repository === "object") {
-  if (!pkg.repository.hasOwnProperty("url")) {
-    throw new Error("URL does not exist in repository section")
-  }
+if (typeof pkg.repository === 'object') {
+  if (!Object.prototype.hasOwnProperty.call(pkg.repository, 'url'))
+    throw new Error('URL does not exist in repository section')
+
   repoUrl = pkg.repository.url
-} else {
+}
+else {
   repoUrl = pkg.repository
 }
 
-let parsedUrl = url.parse(repoUrl)
-let repository = "https://" + (parsedUrl.host || "") + (parsedUrl.path || "")
-let author = pkg.author?.url
+const parsedUrl = url.parse(repoUrl)
+const repository = `https://${parsedUrl.host || ''}${parsedUrl.path || ''}`
+const author = pkg.author?.url
 
 /** @type {import('typedoc').TypeDocOptions} */
 module.exports = {
-    entryPoints: ["./src/index.ts"],
-    out: "docs",
-    navigationLinks: {
-        "Source code": repository,
-    },
-    includeVersion: true,
-    plugin: ["typedoc-theme-yaf"],
-	theme: "yaf",
-    externalPattern: ["**/node_modules/**"],
-	excludeExternals: true,
+  entryPoints: ['./src/index.ts'],
+  out: 'docs',
+  navigationLinks: {
+    'Source code': repository,
+  },
+  includeVersion: true,
+  plugin: ['typedoc-theme-yaf'],
+  theme: 'yaf',
+  externalPattern: ['**/node_modules/**'],
+  excludeExternals: true,
 }
 
-if (author) {
-    module.exports.navigationLinks["Author"] = author
-}
+if (author)
+  module.exports.navigationLinks.Author = author

@@ -7,11 +7,18 @@
 export default {
   clearMocks: true,
   collectCoverage: true,
-  coverageDirectory: "coverage",
-  coverageProvider: "v8",
-  preset: "ts-jest",
+  coverageDirectory: 'coverage',
+  coverageProvider: 'v8',
   setupFiles: [
-    "./tests/jest.setup.js"
+    './tests/jest.setup.js',
   ],
-  testEnvironment: "jsdom",
+  testEnvironment: 'jsdom',
+  transform: {
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        tsconfig: 'tsconfig.extended.json',
+      },
+    ],
+  },
 }

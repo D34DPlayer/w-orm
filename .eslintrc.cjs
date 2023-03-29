@@ -1,8 +1,8 @@
-process.env.ESLINT_TSCONFIG = 'tsconfig.json'
+process.env.ESLINT_TSCONFIG = 'tsconfig.extended.json'
 
 module.exports = {
   extends: '@antfu',
-  ignorePatterns: ['dist', 'node_modules'],
+  ignorePatterns: ['dist', 'node_modules', 'docs', 'tests', '*.md'],
   rules: {
     'no-console': 'warn',
     '@typescript-eslint/no-inferrable-types': 'off',

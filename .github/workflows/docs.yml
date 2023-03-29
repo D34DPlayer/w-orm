@@ -1,7 +1,7 @@
 name: PUBLISH DOCS
 on:
-  workflow_dispatch:
-  workflow_call:
+  - workflow_dispatch
+  - workflow_call
 permissions:
   contents: write # allows the 'Commit' step without tokens
 
@@ -44,8 +44,8 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version-file: ".nvmrc"
-          cache: "pnpm"
+          node-version-file: .nvmrc
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

@@ -10,12 +10,12 @@ This package's objective is to hide away this ugly truth and expose it with a ni
 
 A table can be simply created as follows:
 ```ts
-import { Field, Model } from "w-orm"
+import { Field, Model } from 'w-orm'
 
 enum UserRole {
-    Admin,
-    Moderator,
-    Guest,
+  Admin,
+  Moderator,
+  Guest,
 }
 
 class User extends Model {
@@ -40,18 +40,18 @@ And can be interacted with as follows:
 ```ts
 // With typing support!
 const user = await User.create({
-    username: "Joe",
-    balance: 42,
+  username: 'Joe',
+  balance: 42,
 })
 
 const allUsers = await User.all()
 
 const otherUser = await User.find({
-    username: "Carlos",
+  username: 'Carlos',
 }).first()
 
 const allAdmins = await User.find({
-    role: UserRole.Admin,
+  role: UserRole.Admin,
 }).all()
 
 await otherUser.remove()
@@ -66,7 +66,9 @@ await otherUser.remove()
     `import "reflect-metadata"`
 
 3. Finally the following needs to be enabled in your `tsconfig.json`
-   ```json
-   "emitDecoratorMetadata": true,
-   "experimentalDecorators": true,
+  ```json
+  {
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
+  }
    ```

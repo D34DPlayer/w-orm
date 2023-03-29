@@ -1,8 +1,8 @@
-import { TablesMetadata } from "./metadata"
+import { TablesMetadata } from './metadata'
 
 export class Model {
-  static create<T extends Model>(this: {new(): T}, values?: Omit<Partial<T>, keyof Model>): T {
-    const instance = Object.create(this.prototype) as T
+  static create<T extends Model>(this: { new(): T }, values?: Omit<Partial<T>, keyof Model>): T {
+    const instance = Object.create(this.prototype as object) as T
     Object.assign(instance, values)
 
     const tableDef = TablesMetadata[this.name]
@@ -13,16 +13,19 @@ export class Model {
       // Check if field is defined
       if (instance[(field as keyof T)] === undefined) {
         // Check if field has a default value
-        if (fieldOpts.default !== undefined)
+        if (fieldOpts.default !== undefined) {
           // Check if default value is a generator
-          if (fieldOpts.default instanceof Function) {
+          if (fieldOpts.default instanceof Function)
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
             instance[(field as keyof T)] = fieldOpts.default()
-          } else {
+          else
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             instance[(field as keyof T)] = fieldOpts.default
-          }
+        }
         else
-          if (!fieldOpts.nullable)
-            throw new Error(`Field ${field} is not nullable`)
+        if (!fieldOpts.nullable) {
+          throw new Error(`Field ${field} is not nullable`)
+        }
       }
     }
 
