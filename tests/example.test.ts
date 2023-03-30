@@ -3,9 +3,9 @@ import { expect, test } from '@jest/globals'
 import { Field, Model, TablesMetadata, deleteDB, init } from '../src'
 
 enum UserRole {
-  Admin,
-  Moderator,
-  Guest,
+  Admin = 'admin',
+  Moderator = 'moderator',
+  Guest = 'guest',
 }
 
 class User extends Model {
@@ -26,13 +26,15 @@ class User extends Model {
 }
 
 test('Test example usage', async () => {
-  await deleteDB('test').catch(console.error)
-  const db = await init('test', 1).catch(console.error)
-  console.log(TablesMetadata)
+  await init('test', 1).catch(console.error)
 
-  const inst = User.create({
+  const inst = await User.create({
     username: 'test',
     balance: 2,
   })
   expect(inst.username).toBe('test')
+  
+  const inst2 = await User.get(inst.id)
+
+  expect(inst2).toEqual(inst)
 })

@@ -45,9 +45,16 @@ export async function init(dbName: string, version: number) {
 
     request.onupgradeneeded = (_) => {
       _updateDB(request.result, dbName, version)
-      console.warn('Database upgrade needed')
+      console.debug('Database upgrade needed')
       createTables()
-      resolve(request.result)
+      if (request.transaction) {
+        request.transaction.oncomplete = () => {
+          resolve(request.result)
+        }
+      }
+      else {
+        resolve(request.result)
+      }
     }
   })
 }
@@ -66,12 +73,8 @@ export async function deleteDB(dbName: string) {
   })
 }
 
-class DBTransaction {
-  private transaction: IDBTransaction
-  constructor(private mode: IDBTransactionMode, objectStoreName: string) {
-    if (!db.connected)
-      throw new Error('Database is not connected')
-
-    this.transaction = db.session.transaction([objectStoreName], mode)
-  }
+export function objectStore(storeName: string, mode: IDBTransactionMode = 'readonly') {
+  if (!db.connected)
+    throw new Error('Database is not connected')
+  return db.session.transaction(storeName, mode).objectStore(storeName)
 }

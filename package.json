@@ -38,7 +38,8 @@
     "preversion": "pnpm lint",
     "version": "pnpm lint:fix && git add -A src",
     "postversion": "git push && git push --tags",
-    "test": "pnpm build:dist && jest"
+    "test": "pnpm build:dist && jest --no-cache",
+    "test:watch": "jest --watch --no-cache"
   },
   "dependencies": {
     "reflect-metadata": "^0.1.13"

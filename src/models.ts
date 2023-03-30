@@ -1,8 +1,9 @@
 import { TablesMetadata } from './metadata'
+import { objectStore } from './connection'
 
 export class Model {
-  static create<T extends Model>(this: { new(): T }, values?: Omit<Partial<T>, keyof Model>): T {
-    const instance = Object.create(this.prototype as object) as T
+  static async create<T extends Model>(this: { new(): T }, values?: Omit<Partial<T>, keyof Model>): Promise<T> {
+    const instance = new this()
     Object.assign(instance, values)
 
     const tableDef = TablesMetadata[this.name]
@@ -29,6 +30,39 @@ export class Model {
       }
     }
 
-    return instance
+    // Save instance to database
+    const store = objectStore(this.name, 'readwrite')
+
+    return new Promise((resolve, reject) => {
+      const request = store.add(instance)
+      request.onerror = (_) => {
+        reject(instance)
+      }
+      if (request.transaction) {
+        request.transaction.oncomplete = (_) => {
+          resolve(instance)
+        }
+      }
+      else {
+        throw new Error('Transaction not found')
+      }
+    })
+  }
+
+  static async get<T extends Model>(this: { new(): T }, key: IDBValidKey): Promise<T> {
+    const store = objectStore(this.name)
+    return new Promise((resolve, reject) => {
+      const request = store.get(Array.isArray(key) ? key : [key])
+      request.onerror = (_) => {
+        reject(request.error)
+      }
+      request.onsuccess = (_) => {
+        const instance = new this()
+        Object.assign(instance, request.result)
+        resolve(instance)
+      }
+
+      request.transaction?.commit()
+    })
   }
 }
