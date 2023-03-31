@@ -46,11 +46,11 @@ const user = await User.create({
 
 const allUsers = await User.all()
 
-const otherUser = await User.find({
+const otherUser = await User.filter({
   username: 'Carlos',
 }).first()
 
-const allAdmins = await User.find({
+const allAdmins = await User.filter({
   role: UserRole.Admin,
 }).all()
 

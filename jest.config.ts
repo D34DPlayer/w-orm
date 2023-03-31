@@ -10,7 +10,7 @@ export default {
   coverageDirectory: 'coverage',
   coverageProvider: 'v8',
   setupFiles: [
-    './tests/jest.setup.js',
+    './tests/jest.setup.ts',
   ],
   testEnvironment: 'jsdom',
   transform: {

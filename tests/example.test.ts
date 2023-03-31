@@ -1,6 +1,6 @@
 import 'fake-indexeddb/auto'
 import { expect, test } from '@jest/globals'
-import { Field, Model, TablesMetadata, deleteDB, init } from '../src'
+import { Field, Model, init } from '../src'
 
 enum UserRole {
   Admin = 'admin',
@@ -36,5 +36,11 @@ test('Test example usage', async () => {
   
   const inst2 = await User.get(inst.id)
 
+  expect(inst2).not.toBe(null)
   expect(inst2).toEqual(inst)
+
+  await inst.delete()
+
+  const inst3 = await User.get(inst.id)
+  expect(inst3).toBe(null)
 })
