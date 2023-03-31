@@ -13,7 +13,7 @@ export function addFieldToMetadata<T>(tableName: string, fieldName: string, opti
   TablesMetadata[tableName][fieldName] = options
 }
 
-function getPrimaryKeys(tableName: string) {
+export function getPrimaryKeys(tableName: string) {
   const table = TablesMetadata[tableName]
   if (!table)
     return []

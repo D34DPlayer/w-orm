@@ -15,10 +15,13 @@ export function Field<T>(options: Partial<FieldOptions<T>> = {}): PropertyDecora
 
     const type = Reflect.getMetadata('design:type', object, propertyName) as () => T
 
+    if (options.primaryKey && options.nullable)
+      throw new Error('Primary key cannot be nullable')
+
     const newOptions: FieldOptions<T> = {
       primaryKey: false,
       unique: false,
-      nullable: true,
+      nullable: !options.primaryKey,
       type,
       ...options,
     }
