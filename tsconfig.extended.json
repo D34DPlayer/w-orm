@@ -2,9 +2,9 @@
   "extends": "./tsconfig.json",
   "include": [
     "src/**/*",
-    "tests/**/*",
+    "test/**/*",
     ".eslintrc.cjs",
-    "rollup.config.js",
+    "rollup.config.mjs",
     "typedoc.config.cjs"
   ]
 }

@@ -18,7 +18,7 @@ export default {
   },
   plugins: [
     json(),
-    typescript({ declaration: true, declarationDir: 'types' }),
+    typescript({ declaration: true, declarationDir: 'types', module: 'ESNext' }),
     commonjs(),
     resolve(),
   ],

@@ -1,6 +1,5 @@
 {
   "name": "w-orm",
-  "type": "module",
   "version": "0.1.0",
   "description": "IndexedDB ORM",
   "author": {
@@ -28,7 +27,7 @@
     "lint:fix": "eslint . --fix",
     "prebuild": "rimraf dist",
     "build:lib": "tsc --module commonjs",
-    "build:dist": "rollup -c rollup.config.js",
+    "build:dist": "rollup -c rollup.config.mjs",
     "build:docs": "typedoc",
     "build": "pnpm build:lib && pnpm build:dist",
     "start": "rollup -c rollup.config.js -w",
@@ -37,7 +36,9 @@
     "prepublishOnly": "pnpm lint",
     "preversion": "pnpm lint",
     "version": "pnpm lint:fix && git add -A src",
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "test": "mocha",
+    "test:watch": "mocha --watch --reporter min"
   },
   "dependencies": {
     "reflect-metadata": "^0.1.13"
@@ -48,11 +49,15 @@
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-typescript": "^11.0.0",
+    "@types/chai": "^4.3.4",
+    "@types/mocha": "^10.0.1",
     "@types/node": "^18.15.10",
     "@typescript/lib-dom": "npm:@types/web@^0.0.99",
+    "chai": "^4.3.7",
     "eslint": "^8.36.0",
     "fake-indexeddb": "^4.0.1",
     "lint-staged": "^13.2.0",
+    "mocha": "^10.2.0",
     "rimraf": "^4.4.1",
     "rollup": "^3.20.2",
     "serve": "^14.2.0",

@@ -1,5 +1,5 @@
 import type { Model, ModelWithoutPrototype } from './models'
-import { objectStore } from './connection'
+import { _objectStore } from './connection'
 
 export type Filter<T extends Model> = Record<keyof ModelWithoutPrototype<T>, any>
 export type OrderBy<T extends Model> = (string & keyof ModelWithoutPrototype<T>) |
@@ -30,7 +30,7 @@ export class Query<T extends Model> {
   }
 
   _getCursor() {
-    const store = objectStore(this.TargetModel.name)
+    const store = _objectStore(this.TargetModel.name)
     if (this._orderBy) {
       const index = store.index(this._orderBy)
 

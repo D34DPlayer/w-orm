@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "ES2015",
+    "module": "CommonJS",
     "target": "ES5",
     "lib": [
       "ES2020",
@@ -8,13 +8,15 @@
     ],
     "types": [
       "reflect-metadata",
-      "node"
+      "node",
+      "mocha"
     ],
     "sourceMap": true,
     "outDir": "./dist/lib",
     "strict": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
   "include": [

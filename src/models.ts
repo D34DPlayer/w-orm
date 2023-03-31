@@ -1,5 +1,5 @@
 import { TablesMetadata, getPrimaryKeys } from './metadata'
-import { objectStore } from './connection'
+import { _objectStore } from './connection'
 import type { Filter, OrderBy } from './query'
 import { Query } from './query'
 
@@ -35,7 +35,7 @@ export class Model {
     }
 
     // Save instance to database
-    const store = objectStore(this.name, 'readwrite')
+    const store = _objectStore(this.name, 'readwrite')
 
     return new Promise((resolve, reject) => {
       const request = store.add(instance)
@@ -54,7 +54,7 @@ export class Model {
   }
 
   static async get<T extends Model>(this: { new(): T }, key: IDBValidKey): Promise<T | null> {
-    const store = objectStore(this.name)
+    const store = _objectStore(this.name)
     return new Promise((resolve, reject) => {
       const request = store.get(Array.isArray(key) ? key : [key])
       request.onerror = (_) => {
@@ -95,7 +95,7 @@ export class Model {
   }
 
   async delete(): Promise<void> {
-    const store = objectStore(this.constructor.name, 'readwrite')
+    const store = _objectStore(this.constructor.name, 'readwrite')
     const request = store.delete(this.keys)
     return new Promise((resolve, reject) => {
       request.onerror = (_) => {

@@ -27,10 +27,19 @@ function _updateDB(_db: IDBDatabase, dbName: string, version: number) {
   })
 }
 
+export interface InitResponse {
+  session: IDBDatabase
+  upgraded: boolean
+}
+
 export async function init(dbName: string, version: number) {
-  return new Promise<IDBDatabase>((resolve, reject) => {
-    if (db.connected)
-      resolve(db.session)
+  return new Promise<InitResponse>((resolve, reject) => {
+    if (db.connected) {
+      resolve({
+        session: db.session,
+        upgraded: false,
+      })
+    }
 
     const request = indexedDB.open(dbName, version)
 
@@ -40,7 +49,10 @@ export async function init(dbName: string, version: number) {
 
     request.onsuccess = (_) => {
       _updateDB(request.result, dbName, version)
-      resolve(request.result)
+      resolve({
+        session: request.result,
+        upgraded: false,
+      })
     }
 
     request.onupgradeneeded = (_) => {
@@ -49,11 +61,17 @@ export async function init(dbName: string, version: number) {
       createTables()
       if (request.transaction) {
         request.transaction.oncomplete = () => {
-          resolve(request.result)
+          resolve({
+            session: request.result,
+            upgraded: true,
+          })
         }
       }
       else {
-        resolve(request.result)
+        resolve({
+          session: request.result,
+          upgraded: true,
+        })
       }
     }
   })
@@ -73,8 +91,20 @@ export async function deleteDB(dbName: string) {
   })
 }
 
-export function objectStore(storeName: string, mode: IDBTransactionMode = 'readonly') {
+export function _objectStore(storeName: string, mode: IDBTransactionMode = 'readonly') {
   if (!db.connected)
     throw new Error('Database is not connected')
   return db.session.transaction(storeName, mode).objectStore(storeName)
+}
+
+export function disconnect() {
+  if (!db.connected)
+    return
+  db.session.close()
+  Object.assign(db, {
+    connected: false,
+    session: undefined,
+    name: undefined,
+    version: undefined,
+  })
 }
