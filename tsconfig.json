@@ -8,7 +8,8 @@
     ],
     "types": [
       "reflect-metadata",
-      "node"
+      "node",
+      "jest"
     ],
     "sourceMap": true,
     "outDir": "./dist/lib",

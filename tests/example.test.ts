@@ -1,5 +1,3 @@
-import 'fake-indexeddb/auto'
-import { expect, test } from '@jest/globals'
 import { Field, Model, init } from '../src'
 
 enum UserRole {
