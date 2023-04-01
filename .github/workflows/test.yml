@@ -36,6 +36,9 @@ jobs:
           - 16
           - 18
     steps:
+      - name: Checkout src
+        uses: actions/checkout@v3
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
