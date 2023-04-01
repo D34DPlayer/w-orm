@@ -38,13 +38,15 @@
     "version": "pnpm lint:fix && git add -A src",
     "postversion": "git push && git push --tags",
     "test": "mocha",
-    "test:watch": "mocha --watch --reporter min"
+    "test:watch": "mocha --watch --reporter min",
+    "test:coverage": "nyc mocha"
   },
   "dependencies": {
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.37.0",
+    "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.0.1",
@@ -58,6 +60,7 @@
     "fake-indexeddb": "^4.0.1",
     "lint-staged": "^13.2.0",
     "mocha": "^10.2.0",
+    "nyc": "^15.1.0",
     "rimraf": "^4.4.1",
     "rollup": "^3.20.2",
     "serve": "^14.2.0",
