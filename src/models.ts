@@ -3,10 +3,14 @@ import { _objectStore } from './connection'
 import type { Filter, OrderBy } from './query'
 import { Query } from './query'
 
-export type ModelWithoutPrototype<T extends Model> = Omit<T, keyof Model>
+/** The user defined fields and their types */
+export type ModelFields<T extends Model> = Omit<T, keyof Model>
+
+/** The user defined fields as a string list */
+export type ModelFieldKey<T extends Model> = string & keyof ModelFields<T>
 
 export class Model {
-  static async create<T extends Model>(this: { new(): T }, values?: Partial<ModelWithoutPrototype<T>>): Promise<T> {
+  static async create<T extends Model>(this: { new(): T }, values?: Partial<ModelFields<T>>): Promise<T> {
     const instance = new this()
     Object.assign(instance, values)
 

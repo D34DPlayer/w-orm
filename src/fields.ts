@@ -1,6 +1,6 @@
-import { addFieldToMetadata } from './metadata'
+import { _addFieldToMetadata } from './metadata'
 
-export interface FieldOptions<T> {
+export interface _FieldOptions<T> {
   primaryKey: boolean
   unique: boolean
   nullable: boolean
@@ -8,17 +8,57 @@ export interface FieldOptions<T> {
   type: () => T
 }
 
-export function Field<T>(options: Partial<FieldOptions<T>> = {}): PropertyDecorator {
+export type FieldOptions<T> = Partial<_FieldOptions<T>>
+
+/**
+ * Describes a field on a model.
+ *
+ * Multiple options can be passed to the decorator:
+ *  - `primaryKey`: Whether the field is the primary key of the model,
+ *                  if multiple fields are marked as primary key, their combination will be the key.
+ *  - `unique`: Whether the field has an unique constraint. This will be enforced by the database.
+ *  - `nullable`: Whether the field can be null, primary keys cannot be nullable.
+ *  - `default`: The default value of the field, it can be a value or a function that returns the value.
+ *  - `type`: The type of the field, it is automatically inferred with typescript.
+ *
+ * Default values:
+ * ```js
+ * {
+ *   primaryKey: false,
+ *   unique: false,
+ *   nullable: !primaryKey,
+ * }
+ * ```
+ *
+ * Usage:
+ * ```ts
+ * class User extends Model {
+ *   @Field({ primaryKey: true })
+ *   id: number
+ *   @Field({ unique: true })
+ *   username: string
+ *   @Field({ default: 0 })
+ *   balance: number
+ *   @Field({ default: () => new Date() })
+ *   createdAt: Date
+ * }
+ * ```
+ * @param options
+ * @returns
+ */
+export function Field<T>(options: FieldOptions<T> = {}): PropertyDecorator {
   return function (object, propertyName) {
     if (typeof propertyName !== 'string')
       throw new Error('Field decorator can only be used on fields')
 
+    // Use "emitDecoratorMetadata" to get the type of the field
     const type = Reflect.getMetadata('design:type', object, propertyName) as () => T
 
     if (options.primaryKey && options.nullable)
       throw new Error('Primary key cannot be nullable')
 
-    const newOptions: FieldOptions<T> = {
+    // Merge options with default values
+    const newOptions: _FieldOptions<T> = {
       primaryKey: false,
       unique: false,
       nullable: !options.primaryKey,
@@ -26,6 +66,6 @@ export function Field<T>(options: Partial<FieldOptions<T>> = {}): PropertyDecora
       ...options,
     }
 
-    addFieldToMetadata<T>(object.constructor.name, propertyName, newOptions)
+    _addFieldToMetadata(object.constructor.name, propertyName, newOptions)
   }
 }

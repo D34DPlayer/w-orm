@@ -1,17 +1,12 @@
-import type { Model, ModelWithoutPrototype } from './models'
+import type { Model, ModelFieldKey, ModelFields } from './models'
 import { _objectStore } from './connection'
 
-export type Filter<T extends Model> = Record<keyof ModelWithoutPrototype<T>, any>
-export type OrderBy<T extends Model> = (string & keyof ModelWithoutPrototype<T>) |
-                                      `-${string & keyof ModelWithoutPrototype<T>}`
-
-type X<T extends Model> = {
-  [K in keyof T as `-${string & K}`]: T[K];
-}
+export type Filter<T extends Model> = Partial<ModelFields<T>>
+export type OrderBy<T extends Model> = (ModelFieldKey<T>) | `-${ModelFieldKey<T>}`
 
 export class Query<T extends Model> {
   private filters = {} as Filter<T>
-  private _orderBy?: string & keyof ModelWithoutPrototype<T>
+  private _orderBy?: ModelFieldKey<T>
   private reverse = false
 
   constructor(private TargetModel: { new(): T }) {}
@@ -22,10 +17,13 @@ export class Query<T extends Model> {
   }
 
   orderBy(field: OrderBy<T>): Query<T> {
-    if (field.startsWith('-'))
+    if (field.startsWith('-')) {
       this.reverse = true
-
-    this._orderBy = field.slice(1) as string & keyof ModelWithoutPrototype<T>
+      this._orderBy = field.slice(1) as ModelFieldKey<T>
+    }
+    else {
+      this._orderBy = field as ModelFieldKey<T>
+    }
     return this
   }
 
