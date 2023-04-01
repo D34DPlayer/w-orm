@@ -1,5 +1,7 @@
 # W(eb)-ORM
 
+[![codecov](https://codecov.io/gh/D34DPlayer/w-orm/branch/main/graph/badge.svg?token=Y9OI2FEWVA)](https://codecov.io/gh/D34DPlayer/w-orm)
+
 [**Documentation**](https://d34dplayer.github.io/w-orm)
 
 [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) is in theory every developer's dream, having a full database built-in into your browser is amazing. However, if you have tried using it, it'll feel lacking compared to an actual SQL database, or even a document database.
