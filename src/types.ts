@@ -42,6 +42,11 @@ export type ModelFields<T extends Model> = Omit<T, keyof Model>
 /** The user defined fields as a string list */
 export type ModelFieldKey<T extends Model> = string & keyof ModelFields<T>
 
-export type Filter<T extends Model> = Partial<ModelFields<T>>
+export type Filter<T extends Model> = {
+  [P in keyof ModelFields<T>]?:
+  ModelFields<T>[P] |
+  ((instance: ModelFields<T>[P]) => boolean) |
+  undefined
+}
 
 export type OrderBy<T extends Model> = (ModelFieldKey<T>) | `-${ModelFieldKey<T>}`

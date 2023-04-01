@@ -77,8 +77,17 @@ export class Query<T extends Model> {
    */
   private _fitsFilters(instance: T): boolean {
     for (const [key, value] of Object.entries(this.filters)) {
-      if (instance[key as keyof T] !== value as T[keyof T])
-        return false
+      if (typeof value === 'function') {
+        // If the value is a function, we call it with the instance's value
+        if (!value(instance[key as keyof T]))
+          return false
+        continue
+      }
+      else {
+        // If the value is not a function, we compare it with the instance's value
+        if (instance[key as keyof T] !== value as T[keyof T])
+          return false
+      }
     }
     return true
   }
@@ -87,8 +96,8 @@ export class Query<T extends Model> {
    * Utility function to get the cursor of the query.
    * @returns
    */
-  private _getCursor(): IDBRequest<IDBCursorWithValue | null> {
-    const store = _objectStore(this.TargetModel.name)
+  private _getCursor(mode: IDBTransactionMode = 'readonly'): IDBRequest<IDBCursorWithValue | null> {
+    const store = _objectStore(this.TargetModel.name, mode)
     if (this._orderBy) {
       const index = store.index(this._orderBy)
 
@@ -182,7 +191,7 @@ export class Query<T extends Model> {
    * @returns - The amount of results deleted
    */
   async delete(): Promise<number> {
-    const cursor = this._getCursor()
+    const cursor = this._getCursor('readwrite')
     let amount = 0
     return new Promise<number>((resolve, reject) => {
       cursor.onsuccess = () => {

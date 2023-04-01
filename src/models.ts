@@ -29,8 +29,10 @@ import { Query } from './query'
  * const allTables = await NewTable.all()
  * // Get with filter
  * const tables = await NewTable.filter({ name: 'John' }).first()
+ * // Get with advanced filter
+ * const tables2 = await NewTable.filter({ name: (n) => n.includes('Ruiz') }).first()
  * // Get with filter and order
- * const tables2 = await NewTable.filter({ name: 'John' }).orderBy('-name').first()
+ * const tables3 = await NewTable.filter({ name: 'John' }).orderBy('-name').first()
  * // Create a new entry
  * const newTable = await NewTable.create({ name: 'John' })
  * // Update an entry
@@ -78,7 +80,7 @@ export class Model {
     return new Promise((resolve, reject) => {
       const request = store.add(instance)
       request.onerror = (_) => {
-        reject(instance)
+        reject(request.error)
       }
       request.onsuccess = (_) => {
         resolve(instance)

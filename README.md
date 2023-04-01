@@ -44,7 +44,7 @@ const user = await User.create({
   balance: 42,
 })
 
-const allUsers = await User.all()
+const allUsers = await User.orderBy('id').all()
 
 const otherUser = await User.filter({
   username: 'Carlos',
@@ -52,6 +52,11 @@ const otherUser = await User.filter({
 
 const allAdmins = await User.filter({
   role: UserRole.Admin,
+}).all()
+
+// Filters are more powerful than just checking values
+const everyoneInDebt = await User.filter({
+  balance: (b) => b < -1
 }).all()
 
 await otherUser.remove()
