@@ -1,14 +1,12 @@
 import { _addFieldToMetadata } from './metadata'
 
-export interface _FieldOptions<T> {
+export interface FieldOptions<T> {
   primaryKey: boolean
   unique: boolean
   nullable: boolean
   default?: T | (() => T)
   type: () => T
 }
-
-export type FieldOptions<T> = Partial<_FieldOptions<T>>
 
 /**
  * Describes a field on a model.
@@ -46,7 +44,7 @@ export type FieldOptions<T> = Partial<_FieldOptions<T>>
  * @param options
  * @returns
  */
-export function Field<T>(options: FieldOptions<T> = {}): PropertyDecorator {
+export function Field<T>(options: Partial<FieldOptions<T>> = {}): PropertyDecorator {
   return function (object, propertyName) {
     if (typeof propertyName !== 'string')
       throw new Error('Field decorator can only be used on fields')
@@ -58,7 +56,7 @@ export function Field<T>(options: FieldOptions<T> = {}): PropertyDecorator {
       throw new Error('Primary key cannot be nullable')
 
     // Merge options with default values
-    const newOptions: _FieldOptions<T> = {
+    const newOptions: FieldOptions<T> = {
       primaryKey: false,
       unique: false,
       nullable: !options.primaryKey,

@@ -1,8 +1,8 @@
-import type { _FieldOptions } from './fields'
+import type { FieldOptions } from './fields'
 import { db } from './connection'
 
 export interface TableMetadata {
-  [fieldName: string]: _FieldOptions<any>
+  [fieldName: string]: FieldOptions<unknown>
 }
 
 /**
@@ -15,7 +15,7 @@ export interface TableMetadata {
  */
 export const TablesMetadata: Record<string, TableMetadata> = {}
 
-export function _addFieldToMetadata<T>(tableName: string, fieldName: string, options: _FieldOptions<T>) {
+export function _addFieldToMetadata<T>(tableName: string, fieldName: string, options: FieldOptions<T>) {
   if (!TablesMetadata[tableName])
     TablesMetadata[tableName] = {}
   TablesMetadata[tableName][fieldName] = options

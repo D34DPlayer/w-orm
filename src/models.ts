@@ -22,14 +22,12 @@ export class Model {
       // Check if field is defined
       if (instance[(field as keyof T)] === undefined) {
         // Check if field has a default value
-        if (fieldOpts.default !== undefined) {
+        if (fieldOpts.default !== undefined && fieldOpts.default !== null) {
           // Check if default value is a generator
           if (fieldOpts.default instanceof Function)
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
-            instance[(field as keyof T)] = fieldOpts.default()
+            instance[(field as keyof T)] = fieldOpts.default() as T[keyof T]
           else
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            instance[(field as keyof T)] = fieldOpts.default
+            instance[(field as keyof T)] = fieldOpts.default as T[keyof T]
         }
         else
         if (!fieldOpts.nullable) {
