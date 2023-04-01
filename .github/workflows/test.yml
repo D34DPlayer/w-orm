@@ -55,3 +55,11 @@ jobs:
 
       - name: Run All Node.js Tests
         run: pnpm test:coverage
+
+      - name: Upload coverage reports to Codecov
+        if: matrix.node == 18
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./coverage/
+          verbose: true
