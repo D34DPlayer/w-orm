@@ -10,6 +10,9 @@ exports.mochaHooks = {
       const { disconnect } = require('../src/connection')
       disconnect()
 
+      const { _resetMetadata } = require('../src/metadata')
+      _resetMetadata()
+
       const req = globalThis.indexedDB.deleteDatabase('test')
       req.onsuccess = () => done()
       req.onerror = () => {

@@ -12,10 +12,26 @@ import { db } from './connection'
  */
 export const TablesMetadata: Record<string, TableMetadata> = {}
 
+/**
+ * Helper function to add a field to the metadata.
+ * @param tableName - The table's name
+ * @param fieldName - The field's name
+ * @param options - The field's options
+ * @internal
+ */
 export function _addFieldToMetadata<T>(tableName: string, fieldName: string, options: FieldOptions<T>) {
   if (!TablesMetadata[tableName])
     TablesMetadata[tableName] = {}
   TablesMetadata[tableName][fieldName] = options
+}
+
+/**
+ * Helper function to reset the metadata.
+ * @internal
+ */
+export function _resetMetadata() {
+  for (const tableName in TablesMetadata)
+    delete TablesMetadata[tableName]
 }
 
 /**
