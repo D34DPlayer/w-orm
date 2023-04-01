@@ -32,7 +32,7 @@ jobs:
     strategy:
       matrix:
         node:
-          - 14
+          # - 14
           - 16
           - 18
     steps:
