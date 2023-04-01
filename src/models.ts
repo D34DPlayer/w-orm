@@ -46,7 +46,7 @@ export class Model {
    * @param values - The values to initialize the model with
    * @returns - The new model instance
    */
-  static async create<T extends Model>(this: { new(): T }, values?: Partial<ModelFields<T>>): Promise<T> {
+  public static async create<T extends Model>(this: { new(): T }, values?: Partial<ModelFields<T>>): Promise<T> {
     const instance = new this()
     Object.assign(instance, values)
 
@@ -80,14 +80,11 @@ export class Model {
       request.onerror = (_) => {
         reject(instance)
       }
-      if (request.transaction) {
-        request.transaction.oncomplete = (_) => {
-          resolve(instance)
-        }
+      request.onsuccess = (_) => {
+        resolve(instance)
       }
-      else {
-        throw new Error('Transaction not found')
-      }
+
+      request.transaction?.commit()
     })
   }
 
@@ -96,7 +93,7 @@ export class Model {
    * @param key - The primary key of the model
    * @returns - The model instance or null if not found
    */
-  static async get<T extends Model>(this: { new(): T }, key: IDBValidKey): Promise<T | null> {
+  public static async get<T extends Model>(this: { new(): T }, key: IDBValidKey): Promise<T | null> {
     const store = _objectStore(this.name)
     return new Promise((resolve, reject) => {
       const request = store.get(Array.isArray(key) ? key : [key])
@@ -122,7 +119,7 @@ export class Model {
    * Get all model instances.
    * @returns - The model instances
    */
-  static async all<T extends Model>(this: { new(): T }): Promise<T[]> {
+  public static async all<T extends Model>(this: { new(): T }): Promise<T[]> {
     return (new Query(this)).all()
   }
 
@@ -130,7 +127,7 @@ export class Model {
    * Get how many model instances there are.
    * @returns - The number of model instances
    */
-  static async count<T extends Model>(this: { new(): T }): Promise<number> {
+  public static async count<T extends Model>(this: { new(): T }): Promise<number> {
     return new Promise<number>((resolve, reject) => {
       const store = _objectStore(this.name)
       const request = store.count()
@@ -150,7 +147,7 @@ export class Model {
    * @param filters - The filters to apply
    * @returns - The new query
    */
-  static filter<T extends Model>(this: { new(): T }, filters: Filter<T>): Query<T> {
+  public static filter<T extends Model>(this: { new(): T }, filters: Filter<T>): Query<T> {
     return (new Query(this)).filter(filters)
   }
 
@@ -159,14 +156,14 @@ export class Model {
    * @param orderBy - The field to order by, prepend a `-` to reverse the order
    * @returns - The new query
    */
-  static orderBy<T extends Model>(this: { new(): T }, orderBy: OrderBy<T>): Query<T> {
+  public static orderBy<T extends Model>(this: { new(): T }, orderBy: OrderBy<T>): Query<T> {
     return (new Query(this)).orderBy(orderBy)
   }
 
   /**
    * Get the primary keys of this instance.
    */
-  get keys(): IDBValidKey[] {
+  public get keys(): IDBValidKey[] {
     const tableKeys = getPrimaryKeys(this.constructor.name)
     const keys = tableKeys.map(key => this[key as keyof this] as IDBValidKey)
 
@@ -176,7 +173,7 @@ export class Model {
   /**
    * Delete this instance from the database.
    */
-  async delete(): Promise<void> {
+  public async delete(): Promise<void> {
     const store = _objectStore(this.constructor.name, 'readwrite')
     const request = store.delete(this.keys)
     return new Promise((resolve, reject) => {
@@ -190,9 +187,9 @@ export class Model {
   }
 
   /**
-   * Save this instance' changes to the database.
+   * Save this instance's changes to the database.
    */
-  async save(): Promise<void> {
+  public async save(): Promise<void> {
     return new Promise((resolve, reject) => {
       const store = _objectStore(this.constructor.name, 'readwrite')
       const request = store.put(this)
