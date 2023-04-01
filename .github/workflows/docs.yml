@@ -1,4 +1,4 @@
-name: PUBLISH DOCS
+name: Publish docs
 on:
   - workflow_dispatch
   - workflow_call
@@ -50,8 +50,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build everything (including docs)
-        run: pnpm run build
+      - name: Build docs
+        run: pnpm run build:docs
 
       - name: tar the new docs
         run: tar -cvf newdocumentation.tar ./docs
