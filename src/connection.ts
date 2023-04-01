@@ -1,26 +1,23 @@
+import type { DB, InitResponse } from './types'
 import { createTables } from './metadata'
 
-export interface DisconnectedDB {
-  connected: false
-}
-
-export interface ConnectedDB {
-  connected: true
-  session: IDBDatabase
-  name: string
-  version: number
-}
-
-export type DB = DisconnectedDB | ConnectedDB
-
+// TODO: Support multiple connections
 /**
  * Global database connection, disconnected by default
  * @type {DB}
+ * @category Global objects
  */
 export const db: DB = {
   connected: false,
 }
 
+/**
+ * Utility function to store the database connection
+ * @param _db - Database connection
+ * @param dbName - Database name
+ * @param version - Database version
+ * @internal
+ */
 function _updateDB(_db: IDBDatabase, dbName: string, version: number) {
   Object.assign(db, {
     session: _db,
@@ -30,11 +27,6 @@ function _updateDB(_db: IDBDatabase, dbName: string, version: number) {
   })
 }
 
-export interface InitResponse {
-  session: IDBDatabase
-  upgraded: boolean
-}
-
 /**
  * Starts a new global database connection.
  * Three scenarios are possible:
@@ -42,16 +34,16 @@ export interface InitResponse {
  * 2. There's no version bump, a new connection is created
  * 3. There's a version bump, a new connection is created and tables created
  *
- * Example:
+ * @example
  * ```js
  * const initResp = await init('my-db', 1)
  * if (initResp.upgraded) {
  *  console.log("Database was upgraded")
  * }
  * ```
- * @param dbName The database name
- * @param version The database version, a version bump will trigger an upgrade
- * @returns {Promise<InitResponse>} The database connection and whether an upgrade was performed
+ * @param dbName - The database name
+ * @param version - The database version, a version bump will trigger an upgrade
+ * @returns {Promise<InitResponse>} - The database connection and whether an upgrade was performed
  */
 export async function init(dbName: string, version: number): Promise<InitResponse> {
   return new Promise<InitResponse>((resolve, reject) => {
@@ -100,8 +92,8 @@ export async function init(dbName: string, version: number): Promise<InitRespons
 /**
  * Deletes a specific database, use with caution.
  * Any open connection needs to be closed or this will hang indefinitely.
- * @param dbName The database name
- * @returns {Promise<Event>} A promise that resolves to the delete event
+ * @param dbName - The database name
+ * @returns {Promise<Event>} - A promise that resolves to the delete event
  */
 export async function deleteDB(dbName: string): Promise<Event> {
   return new Promise((resolve, reject) => {
@@ -117,7 +109,14 @@ export async function deleteDB(dbName: string): Promise<Event> {
   })
 }
 
-export function _objectStore(storeName: string, mode: IDBTransactionMode = 'readonly') {
+/**
+ * Utility function to get an object store from the global database connection
+ * @param storeName The name of the object store
+ * @param mode The transaction mode
+ * @returns { IDBObjectStore } - The object store
+ * @internal
+ */
+export function _objectStore(storeName: string, mode: IDBTransactionMode = 'readonly'): IDBObjectStore {
   if (!db.connected)
     throw new Error('Database is not connected')
   return db.session.transaction(storeName, mode).objectStore(storeName)

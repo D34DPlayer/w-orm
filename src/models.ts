@@ -1,15 +1,51 @@
+import type { Filter, ModelFields, OrderBy } from './types'
 import { TablesMetadata, getPrimaryKeys } from './metadata'
 import { _objectStore } from './connection'
-import type { Filter, OrderBy } from './query'
 import { Query } from './query'
 
-/** The user defined fields and their types */
-export type ModelFields<T extends Model> = Omit<T, keyof Model>
-
-/** The user defined fields as a string list */
-export type ModelFieldKey<T extends Model> = string & keyof ModelFields<T>
-
+/**
+ * Base class for all models.
+ *
+ * @see {@link Field} for more information about fields
+ * @see {@link Query} for more information about querying the database
+ *
+ * @example
+ * Create a new model:
+ * ```ts
+ * import { Model, Field } from 'w-orm'
+ *
+ * class NewTable extends Model {
+ *  @Field({ primaryKey: true })
+ *  id: number
+ *  @Field()
+ *  name: string
+ * }
+ * ```
+ * Query the database:
+ * ```ts
+ * // Get with primary key
+ * const table = await NewTable.get(1)
+ * // Get all
+ * const allTables = await NewTable.all()
+ * // Get with filter
+ * const tables = await NewTable.filter({ name: 'John' }).first()
+ * // Get with filter and order
+ * const tables2 = await NewTable.filter({ name: 'John' }).orderBy('-name').first()
+ * // Create a new entry
+ * const newTable = await NewTable.create({ name: 'John' })
+ * // Update an entry
+ * newTable.name = 'Jane'
+ * await newTable.save()
+ * // Delete an entry
+ * await newTable.delete()
+ * ```
+ */
 export class Model {
+  /**
+   * Create a new model instance.
+   * @param values - The values to initialize the model with
+   * @returns - The new model instance
+   */
   static async create<T extends Model>(this: { new(): T }, values?: Partial<ModelFields<T>>): Promise<T> {
     const instance = new this()
     Object.assign(instance, values)
@@ -55,6 +91,11 @@ export class Model {
     })
   }
 
+  /**
+   * Get a model instance by its primary key.
+   * @param key - The primary key of the model
+   * @returns - The model instance or null if not found
+   */
   static async get<T extends Model>(this: { new(): T }, key: IDBValidKey): Promise<T | null> {
     const store = _objectStore(this.name)
     return new Promise((resolve, reject) => {
@@ -77,18 +118,54 @@ export class Model {
     })
   }
 
+  /**
+   * Get all model instances.
+   * @returns - The model instances
+   */
   static async all<T extends Model>(this: { new(): T }): Promise<T[]> {
     return (new Query(this)).all()
   }
 
+  /**
+   * Get how many model instances there are.
+   * @returns - The number of model instances
+   */
+  static async count<T extends Model>(this: { new(): T }): Promise<number> {
+    return new Promise<number>((resolve, reject) => {
+      const store = _objectStore(this.name)
+      const request = store.count()
+      request.onerror = (_) => {
+        reject(request.error)
+      }
+      request.onsuccess = (_) => {
+        resolve(request.result)
+      }
+
+      request.transaction?.commit()
+    })
+  }
+
+  /**
+   * Start a query for this model with a filter.
+   * @param filters - The filters to apply
+   * @returns - The new query
+   */
   static filter<T extends Model>(this: { new(): T }, filters: Filter<T>): Query<T> {
     return (new Query(this)).filter(filters)
   }
 
+  /**
+   * Start a query for this model with an order.
+   * @param orderBy - The field to order by, prepend a `-` to reverse the order
+   * @returns - The new query
+   */
   static orderBy<T extends Model>(this: { new(): T }, orderBy: OrderBy<T>): Query<T> {
     return (new Query(this)).orderBy(orderBy)
   }
 
+  /**
+   * Get the primary keys of this instance.
+   */
   get keys(): IDBValidKey[] {
     const tableKeys = getPrimaryKeys(this.constructor.name)
     const keys = tableKeys.map(key => this[key as keyof this] as IDBValidKey)
@@ -96,6 +173,9 @@ export class Model {
     return keys
   }
 
+  /**
+   * Delete this instance from the database.
+   */
   async delete(): Promise<void> {
     const store = _objectStore(this.constructor.name, 'readwrite')
     const request = store.delete(this.keys)
@@ -106,6 +186,25 @@ export class Model {
       request.onsuccess = (_) => {
         resolve()
       }
+    })
+  }
+
+  /**
+   * Save this instance' changes to the database.
+   */
+  async save(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const store = _objectStore(this.constructor.name, 'readwrite')
+      const request = store.put(this)
+
+      request.onerror = (_) => {
+        reject(request.error)
+      }
+      request.onsuccess = (_) => {
+        resolve()
+      }
+
+      request.transaction?.commit()
     })
   }
 }

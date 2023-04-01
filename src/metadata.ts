@@ -1,17 +1,14 @@
-import type { FieldOptions } from './fields'
+import type { FieldOptions, TableMetadata } from './types'
 import { db } from './connection'
-
-export interface TableMetadata {
-  [fieldName: string]: FieldOptions<unknown>
-}
 
 /**
  * Global object storing the tables and their fields definitions.
- * It is populated by all the [[Field]] decorators used in the application.
+ * It is populated by all the {@link Field} decorators used in the application.
  *
  * It should be treated as read-only, even though it is not.
  *
  * @readonly
+ * @category Global objects
  */
 export const TablesMetadata: Record<string, TableMetadata> = {}
 
@@ -45,6 +42,7 @@ export function getPrimaryKeys(tableName: string): string[] {
  * This function is called automatically when the database is upgraded and
  * will only work within an upgrade context.
  * @throws {Error} Error if the database is not connected
+ * @internal
  */
 export function createTables(): void {
   if (!db.connected)

@@ -18,7 +18,7 @@ const author = pkg.author?.url
 
 /** @type {import('typedoc').TypeDocOptions} */
 module.exports = {
-  entryPoints: ['./src/index.ts'],
+  entryPoints: ['./src/index.ts', './src/types.ts'],
   out: 'docs',
   navigationLinks: {
     'Source code': repository,
@@ -28,6 +28,7 @@ module.exports = {
   theme: 'yaf',
   externalPattern: ['**/node_modules/**'],
   excludeExternals: true,
+  excludeInternal: true,
 }
 
 if (author)

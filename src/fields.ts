@@ -1,12 +1,5 @@
+import type { FieldOptions } from './types'
 import { _addFieldToMetadata } from './metadata'
-
-export interface FieldOptions<T> {
-  primaryKey: boolean
-  unique: boolean
-  nullable: boolean
-  default?: T | (() => T)
-  type: () => T
-}
 
 /**
  * Describes a field on a model.
@@ -19,7 +12,7 @@ export interface FieldOptions<T> {
  *  - `default`: The default value of the field, it can be a value or a function that returns the value.
  *  - `type`: The type of the field, it is automatically inferred with typescript.
  *
- * Default values:
+ * @default
  * ```js
  * {
  *   primaryKey: false,
@@ -28,7 +21,7 @@ export interface FieldOptions<T> {
  * }
  * ```
  *
- * Usage:
+ * @example
  * ```ts
  * class User extends Model {
  *   @Field({ primaryKey: true })
@@ -42,7 +35,6 @@ export interface FieldOptions<T> {
  * }
  * ```
  * @param options
- * @returns
  */
 export function Field<T>(options: Partial<FieldOptions<T>> = {}): PropertyDecorator {
   return function (object, propertyName) {
