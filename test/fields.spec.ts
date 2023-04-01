@@ -51,6 +51,33 @@ describe('Field options', () => {
     const index = store.index('unique')
     assert.isTrue(index.unique)
   })
+  it('should\'t allow a primary key field to be nullable', () => {
+    assert.throws(() => {
+      class Test extends Model {
+        @Field({ primaryKey: true })
+        id!: number
+
+        @Field({ primaryKey: true, nullable: true })
+        unique!: string
+      }
+
+      return Test
+    }, /cannot be nullable/)
+  })
+  it('should\'t support Symbols', () => {
+    assert.throws(() => {
+      const sym = Symbol('test')
+      class Test extends Model {
+        @Field({ primaryKey: true })
+        id!: number
+
+        @Field({ primaryKey: true })
+        [sym]!: symbol
+      }
+
+      return Test
+    }, /symbols/)
+  })
   // Nullable is tested within model creation
   // Default is tested within model creation
 })

@@ -38,8 +38,8 @@ import { _addFieldToMetadata } from './metadata'
  */
 export function Field<T>(options: Partial<FieldOptions<T>> = {}): PropertyDecorator {
   return function (object, propertyName) {
-    if (typeof propertyName !== 'string')
-      throw new Error('Field decorator can only be used on fields')
+    if (typeof propertyName === 'symbol')
+      throw new Error('Field decorator doesn\'t support symbols')
 
     // Use "emitDecoratorMetadata" to get the type of the field
     const type = Reflect.getMetadata('design:type', object, propertyName) as () => T
