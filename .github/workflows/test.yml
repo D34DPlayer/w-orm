@@ -1,4 +1,4 @@
-name: Run tests
+name: Test CI/CD
 on:
   - push
 
@@ -32,7 +32,7 @@ jobs:
     strategy:
       matrix:
         node:
-          # - 14
+          # - 14 // Supported but breaks on build, not lts so not worth fixing
           - 16
           - 18
     steps:
