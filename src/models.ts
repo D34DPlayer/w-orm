@@ -12,7 +12,7 @@ import { Query } from './query'
  * @example
  * Create a new model:
  * ```ts
- * import { Model, Field } from 'w-orm'
+ * import { Model, Field } from '@d34d/w-orm'
  *
  * class NewTable extends Model {
  *  @Field({ primaryKey: true })

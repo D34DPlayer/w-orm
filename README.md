@@ -12,7 +12,7 @@ This package's objective is to hide away this ugly truth and expose it with a ni
 
 A table can be simply created as follows:
 ```ts
-import { Field, Model } from 'w-orm'
+import { Field, Model } from '@d34d/w-orm'
 
 enum UserRole {
   Admin,
@@ -67,7 +67,7 @@ await otherUser.remove()
 ## Installation
 
 1. Install the npm package:
-   `npm install w-orm reflect-metadata`
+   `npm install @d34d/w-orm reflect-metadata`
 
 2. reflect-metadata needs to be imported somewhere in the global space of your app (eg. index.ts):
     `import "reflect-metadata"`

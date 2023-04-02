@@ -2,8 +2,8 @@ name: Publish docs
 on:
   workflow_dispatch: {}
   workflow_call: {}
-  push:
-    branches: [main]
+  release:
+    types: [published]
 permissions:
   contents: write # allows the 'Commit' step without tokens
 
