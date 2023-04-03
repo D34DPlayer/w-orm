@@ -85,8 +85,6 @@ export class Model {
       request.onsuccess = (_) => {
         resolve(instance)
       }
-
-      request.transaction?.commit()
     })
   }
 
@@ -112,8 +110,6 @@ export class Model {
           resolve(instance)
         }
       }
-
-      request.transaction?.commit()
     })
   }
 
@@ -139,8 +135,6 @@ export class Model {
       request.onsuccess = (_) => {
         resolve(request.result)
       }
-
-      request.transaction?.commit()
     })
   }
 
@@ -202,8 +196,6 @@ export class Model {
       request.onsuccess = (_) => {
         resolve()
       }
-
-      request.transaction?.commit()
     })
   }
 }
