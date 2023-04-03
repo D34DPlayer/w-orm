@@ -33,6 +33,13 @@ export interface FieldOptions<T> {
 
 /** {@inheritDoc W-ORM.TablesMetadata } */
 export interface TableMetadata {
+  extends?: string
+  fields: TableFieldsMetadata
+  abstract: boolean
+}
+
+/** {@inheritDoc W-ORM.TablesMetadata } */
+export interface TableFieldsMetadata {
   [fieldName: string]: FieldOptions<unknown>
 }
 

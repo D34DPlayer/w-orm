@@ -80,4 +80,23 @@ describe('Field options', () => {
   })
   // Nullable is tested within model creation
   // Default is tested within model creation
+  it('should support inheritance', async () => {
+    abstract class BaseModel extends Model {
+      @Field({ primaryKey: true, default: () => Date.now() })
+      id!: number
+
+      @Field({ default: 1 })
+      version!: number
+    }
+
+    class Test extends BaseModel {
+      @Field({ primaryKey: true })
+      test!: string
+    }
+
+    await init('test', 1)
+
+    const store = _objectStore('Test')
+    assert.sameMembers((store.keyPath as string[]), ['id', 'test'])
+  })
 })
