@@ -1,5 +1,5 @@
 import type { FieldOptions } from './types'
-import { _addFieldToMetadata } from './metadata'
+import { _addFieldToMetadata, _handleTableData } from './metadata'
 
 /**
  * Describes a field on a model.
@@ -56,6 +56,7 @@ export function Field<T>(options: Partial<FieldOptions<T>> = {}): PropertyDecora
       ...options,
     }
 
+    _handleTableData(object)
     _addFieldToMetadata(object.constructor.name, propertyName, newOptions)
   }
 }

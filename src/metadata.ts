@@ -1,5 +1,6 @@
 import type { FieldOptions, TableMetadata } from './types'
 import { db } from './connection'
+import type { Model } from './models'
 
 /**
  * Global object storing the tables and their fields definitions.
@@ -21,8 +22,8 @@ export const TablesMetadata: Record<string, TableMetadata> = {}
  */
 export function _addFieldToMetadata<T>(tableName: string, fieldName: string, options: FieldOptions<T>) {
   if (!TablesMetadata[tableName])
-    TablesMetadata[tableName] = {}
-  TablesMetadata[tableName][fieldName] = options
+    throw new Error(`Table ${tableName} is not defined`)
+  TablesMetadata[tableName].fields[fieldName] = options
 }
 
 /**
@@ -34,19 +35,52 @@ export function _resetMetadata() {
     delete TablesMetadata[tableName]
 }
 
+export function _handleTableData<T>(instance: T) {
+  if (!instance)
+    return
+
+  const tableName = instance.constructor.name
+
+  if (tableName in TablesMetadata)
+    return
+
+  const parentName = (Object.getPrototypeOf(instance.constructor) as typeof Model).name
+
+  if (parentName !== 'Model') {
+    const parentMetadata = TablesMetadata[parentName]
+
+    if (!parentMetadata)
+      throw new Error(`Parent table ${parentName} is not defined`)
+
+    TablesMetadata[tableName] = {
+      fields: { ...parentMetadata.fields },
+      abstract: false,
+      extends: parentName,
+    }
+
+    parentMetadata.abstract = true
+  }
+  else {
+    TablesMetadata[tableName] = {
+      fields: {},
+      abstract: false,
+    }
+  }
+}
+
 /**
  * Extract the primary keys of a table from its metadata.
  * @param tableName The table's name
  * @returns {string[]} The primary keys of the table
  */
 export function getPrimaryKeys(tableName: string): string[] {
-  const table = TablesMetadata[tableName]
-  if (!table)
+  const tableFields = TablesMetadata[tableName]?.fields
+  if (!tableFields)
     return []
 
   const primaryKeys = []
-  for (const fieldName in table) {
-    const field = table[fieldName]
+  for (const fieldName in tableFields) {
+    const field = tableFields[fieldName]
     if (field.primaryKey)
       primaryKeys.push(fieldName)
   }
@@ -64,11 +98,14 @@ export function createTables(): void {
   if (!db.connected)
     throw new Error('Database is not connected')
   for (const tableName in TablesMetadata) {
-    const table = TablesMetadata[tableName]
+    if (TablesMetadata[tableName].abstract)
+      continue
+
+    const tableFields = TablesMetadata[tableName].fields
     const primaryKeys = getPrimaryKeys(tableName)
     const store = db.session.createObjectStore(tableName, { keyPath: primaryKeys })
-    for (const fieldName in table) {
-      const field = table[fieldName]
+    for (const fieldName in tableFields) {
+      const field = tableFields[fieldName]
       store.createIndex(fieldName, fieldName, { unique: field.unique })
     }
   }

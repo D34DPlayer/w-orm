@@ -42,7 +42,7 @@ import { Query } from './query'
  * await newTable.delete()
  * ```
  */
-export class Model {
+export abstract class Model {
   /**
    * Create a new model instance.
    * @param values - The values to initialize the model with
@@ -56,7 +56,7 @@ export class Model {
     if (!tableDef)
       throw new Error(`Table definition for ${this.name} not found`)
 
-    for (const [field, fieldOpts] of Object.entries(tableDef)) {
+    for (const [field, fieldOpts] of Object.entries(tableDef.fields)) {
       // Check if field is defined
       if (instance[(field as keyof T)] === undefined) {
         // Check if field has a default value
