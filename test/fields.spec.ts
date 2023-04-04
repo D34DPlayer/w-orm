@@ -1,8 +1,9 @@
 import { assert } from 'chai'
 
-import { _objectStore, db, init } from '../src/connection'
+import { db, init } from '../src/connection'
 import { Model } from '../src/models'
 import { Field } from '../src/fields'
+import { _objectStore } from '../src/transaction'
 
 describe('Field options', () => {
   it('should be able to set a field as primary key', async () => {

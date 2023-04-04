@@ -110,19 +110,6 @@ export async function deleteDB(dbName: string): Promise<Event> {
 }
 
 /**
- * Utility function to get an object store from the global database connection
- * @param storeName The name of the object store
- * @param mode The transaction mode
- * @returns { IDBObjectStore } - The object store
- * @internal
- */
-export function _objectStore(storeName: string, mode: IDBTransactionMode = 'readonly'): IDBObjectStore {
-  if (!db.connected)
-    throw new Error('Database is not connected')
-  return db.session.transaction(storeName, mode).objectStore(storeName)
-}
-
-/**
  * Closes the global database connection
  */
 export function disconnect(): void {
