@@ -1,8 +1,9 @@
 import { assert } from 'chai'
 
 import { Model } from '../src/models'
-import { _objectStore, init } from '../src/connection'
+import { init } from '../src/connection'
 import { Field } from '../src/fields'
+import { _objectStore } from '../src/transaction'
 
 describe('Models', () => {
   describe('create', () => {

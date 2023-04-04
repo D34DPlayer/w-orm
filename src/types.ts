@@ -57,3 +57,5 @@ export type Filter<T extends Model> = {
 }
 
 export type OrderBy<T extends Model> = (ModelFieldKey<T>) | `-${ModelFieldKey<T>}`
+
+export type TransactionCallback = (tx: IDBTransaction) => Promise<void>
