@@ -1,6 +1,6 @@
 import type { Filter, ModelFieldKey, OrderBy } from './types'
 import type { Model } from './models'
-import { _objectStore } from './connection'
+import { _objectStore } from './transaction'
 
 export class Query<T extends Model> {
   /** The filters to apply to the query */
@@ -9,6 +9,10 @@ export class Query<T extends Model> {
   private _orderBy?: ModelFieldKey<T>
   /** Whether to reverse the order of the query */
   private _reverse = false
+  /** Maximum amount of items to return */
+  private _limit?: number
+  /** Amount of items to skip */
+  private _skip?: number
 
   /**
    * A query builder for the models.
@@ -96,8 +100,8 @@ export class Query<T extends Model> {
    * Utility function to get the cursor of the query.
    * @returns
    */
-  private _getCursor(mode: IDBTransactionMode = 'readonly'): IDBRequest<IDBCursorWithValue | null> {
-    const store = _objectStore(this.TargetModel.name, mode)
+  private _getCursor(transactionOrMode: IDBTransactionMode | IDBTransaction = 'readonly'): IDBRequest<IDBCursorWithValue | null> {
+    const store = _objectStore(this.TargetModel.name, transactionOrMode)
     if (this._orderBy) {
       const index = store.index(this._orderBy)
 
@@ -112,8 +116,8 @@ export class Query<T extends Model> {
    * Executes the query and returns the first result.
    * @returns - The first result of the query, or null if no result was found
    */
-  async first(): Promise<T | null> {
-    const cursor = this._getCursor()
+  async first(transaction?: IDBTransaction): Promise<T | null> {
+    const cursor = this._getCursor(transaction)
     return new Promise<T | null>((resolve, reject) => {
       cursor.onsuccess = () => {
         if (!cursor.result) {
@@ -138,8 +142,8 @@ export class Query<T extends Model> {
    * Executes the query and returns all the results.
    * @returns - All the results of the query
    */
-  async all(): Promise<T[]> {
-    const cursor = this._getCursor()
+  async all(transaction?: IDBTransaction): Promise<T[]> {
+    const cursor = this._getCursor(transaction)
     const result: T[] = []
     return new Promise<T[]>((resolve, reject) => {
       cursor.onsuccess = () => {
@@ -165,8 +169,8 @@ export class Query<T extends Model> {
    * Executes the query and returns the number of results.
    * @returns - The amount of results of the query
    */
-  async count(): Promise<number> {
-    const cursor = this._getCursor()
+  async count(transaction?: IDBTransaction): Promise<number> {
+    const cursor = this._getCursor(transaction)
     let count = 0
     return new Promise<number>((resolve, reject) => {
       cursor.onsuccess = () => {
@@ -190,8 +194,8 @@ export class Query<T extends Model> {
    * Executes the query and deletes all the results.
    * @returns - The amount of results deleted
    */
-  async delete(): Promise<number> {
-    const cursor = this._getCursor('readwrite')
+  async delete(transaction?: IDBTransaction): Promise<number> {
+    const cursor = this._getCursor(transaction || 'readwrite')
     let amount = 0
     return new Promise<number>((resolve, reject) => {
       cursor.onsuccess = () => {

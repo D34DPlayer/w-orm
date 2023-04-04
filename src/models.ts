@@ -1,6 +1,6 @@
 import type { Filter, ModelFields, OrderBy } from './types'
 import { TablesMetadata, getPrimaryKeys } from './metadata'
-import { _objectStore } from './connection'
+import { _objectStore } from './transaction'
 import { Query } from './query'
 
 /**
@@ -48,7 +48,7 @@ export abstract class Model {
    * @param values - The values to initialize the model with
    * @returns - The new model instance
    */
-  public static async create<T extends Model>(this: { new(): T }, values?: Partial<ModelFields<T>>): Promise<T> {
+  public static async create<T extends Model>(this: { new(): T }, values?: Partial<ModelFields<T>>, transaction?: IDBTransaction): Promise<T> {
     const instance = new this()
     Object.assign(instance, values)
 
@@ -75,7 +75,7 @@ export abstract class Model {
     }
 
     // Save instance to database
-    const store = _objectStore(this.name, 'readwrite')
+    const store = _objectStore(this.name, transaction || 'readwrite')
 
     return new Promise((resolve, reject) => {
       const request = store.add(instance)
@@ -93,8 +93,8 @@ export abstract class Model {
    * @param key - The primary key of the model
    * @returns - The model instance or null if not found
    */
-  public static async get<T extends Model>(this: { new(): T }, key: IDBValidKey): Promise<T | null> {
-    const store = _objectStore(this.name)
+  public static async get<T extends Model>(this: { new(): T }, key: IDBValidKey, transaction?: IDBTransaction): Promise<T | null> {
+    const store = _objectStore(this.name, transaction)
     return new Promise((resolve, reject) => {
       const request = store.get(Array.isArray(key) ? key : [key])
       request.onerror = (_) => {
@@ -117,17 +117,17 @@ export abstract class Model {
    * Get all model instances.
    * @returns - The model instances
    */
-  public static async all<T extends Model>(this: { new(): T }): Promise<T[]> {
-    return (new Query(this)).all()
+  public static async all<T extends Model>(this: { new(): T }, transaction?: IDBTransaction): Promise<T[]> {
+    return (new Query(this)).all(transaction)
   }
 
   /**
    * Get how many model instances there are.
    * @returns - The number of model instances
    */
-  public static async count<T extends Model>(this: { new(): T }): Promise<number> {
+  public static async count<T extends Model>(this: { new(): T }, transaction?: IDBTransaction): Promise<number> {
     return new Promise<number>((resolve, reject) => {
-      const store = _objectStore(this.name)
+      const store = _objectStore(this.name, transaction)
       const request = store.count()
       request.onerror = (_) => {
         reject(request.error)
@@ -169,8 +169,8 @@ export abstract class Model {
   /**
    * Delete this instance from the database.
    */
-  public async delete(): Promise<void> {
-    const store = _objectStore(this.constructor.name, 'readwrite')
+  public async delete(transaction?: IDBTransaction): Promise<void> {
+    const store = _objectStore(this.constructor.name, transaction || 'readwrite')
     const request = store.delete(this.keys)
     return new Promise((resolve, reject) => {
       request.onerror = (_) => {
@@ -185,9 +185,9 @@ export abstract class Model {
   /**
    * Save this instance's changes to the database.
    */
-  public async save(): Promise<void> {
+  public async save(transaction?: IDBTransaction): Promise<void> {
     return new Promise((resolve, reject) => {
-      const store = _objectStore(this.constructor.name, 'readwrite')
+      const store = _objectStore(this.constructor.name, transaction || 'readwrite')
       const request = store.put(this)
 
       request.onerror = (_) => {
