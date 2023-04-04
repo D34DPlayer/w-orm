@@ -23,6 +23,25 @@ export function _objectStore(storeName: string, modeOrTransaction?: IDBTransacti
   }
 }
 
+/**
+ * Starts a db transaction.
+ * Depending on the result of the transactionCallback, the transaction will be committed or aborted.
+ *
+ * @example
+ * ```ts
+ * await Transaction('readwrite', async (tx) => {
+ *  const newUser = await User.create({ name: 'John Doe' }, tx)
+ *  const getUser = await User.get(newUser.id, tx)
+ *
+ *  // Any error thrown in the callback will abort the transaction, this will rollback any changes made
+ *  throw new Error('rollback')
+ *  // If no error is thrown, the transaction will be committed
+ * })
+ * ```
+ *
+ * @param mode - The transaction mode
+ * @param transactionCallback - The callback to execute in the transaction
+ */
 export async function Transaction(mode: IDBTransactionMode, transactionCallback: TransactionCallback): Promise<void> {
   if (!db.connected)
     throw new Error('Database is not connected')
