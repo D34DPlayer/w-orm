@@ -1,4 +1,4 @@
-import type { Filter, ModelFieldKey, OrderBy } from './types'
+import type { Filter, ModelFieldKey, OrderBy, TransactionOrMode } from './types'
 import type { Model } from './models'
 import { _objectStore } from './transaction'
 
@@ -75,6 +75,28 @@ export class Query<T extends Model> {
   }
 
   /**
+   * Add a limit to the query.
+   * This means that the query will only return a maximum of `limit` items.
+   * @param limit - The maximum amount of items to return
+   * @returns - The query itself, to allow chaining
+   */
+  public limit(limit: number): Query<T> {
+    this._limit = limit
+    return this
+  }
+
+  /**
+   * Add an offset to the query.
+   * This means that the query will skip the first `offset` items.
+   * @param offset - The amount of items to skip
+   * @returns - The query itself, to allow chaining
+   */
+  public offset(offset: number): Query<T> {
+    this._skip = offset
+    return this
+  }
+
+  /**
    * Checks if the given instance fits the filters of the query.
    * @param instance - The instance to check
    * @returns - Whether the instance fits the filters
@@ -100,7 +122,7 @@ export class Query<T extends Model> {
    * Utility function to get the cursor of the query.
    * @returns
    */
-  private _getCursor(transactionOrMode: IDBTransactionMode | IDBTransaction = 'readonly'): IDBRequest<IDBCursorWithValue | null> {
+  private _getCursor(transactionOrMode: TransactionOrMode = 'readonly'): IDBRequest<IDBCursorWithValue | null> {
     const store = _objectStore(this.TargetModel.name, transactionOrMode)
     if (this._orderBy) {
       const index = store.index(this._orderBy)
@@ -113,29 +135,63 @@ export class Query<T extends Model> {
   }
 
   /**
+   * Utility function to handle a cursor's cycle.
+   * This implement the limit, offset and filter.
+   * @param valueCallback - The callback to call for each value
+   * @param transactionOrMode - The transaction or mode to use
+   * @returns - A promise that resolves when the cursor is done
+   */
+  private _cursorLogic(valueCallback: (value: IDBCursorWithValue) => void, transactionOrMode?: TransactionOrMode): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      const request = this._getCursor(transactionOrMode)
+      let matches = 0
+      let skipped = 0
+
+      request.onsuccess = () => {
+        if (!request.result) {
+          resolve()
+        }
+        else {
+          // If we have a limit, we check if we have reached it
+          if ((matches - skipped) === this._limit) {
+            resolve()
+            return
+          }
+          // Apply the filters
+          if (this._fitsFilters(request.result.value as T)) {
+            // If we have an offset, we wait until we have reached it
+            if (!this._skip || matches >= this._skip)
+              valueCallback(request.result)
+            else
+              skipped += 1
+
+            matches += 1
+          }
+
+          request.result.continue()
+        }
+      }
+      request.onerror = (event) => {
+        reject(event)
+      }
+    })
+  }
+
+  /**
    * Executes the query and returns the first result.
    * @returns - The first result of the query, or null if no result was found
    */
   async first(transaction?: IDBTransaction): Promise<T | null> {
-    const cursor = this._getCursor(transaction)
-    return new Promise<T | null>((resolve, reject) => {
-      cursor.onsuccess = () => {
-        if (!cursor.result) {
-          resolve(null)
-        }
-        else {
-          if (this._fitsFilters(cursor.result.value as T)) {
-            const instance = new this.TargetModel()
-            Object.assign(instance, cursor.result.value)
-            resolve(instance)
-          }
-          else { cursor.result.continue() }
-        }
-      }
-      cursor.onerror = (event) => {
-        reject(event)
-      }
-    })
+    let result: T | null = null
+    this._limit = 1
+
+    await this._cursorLogic((cursor) => {
+      const instance = new this.TargetModel()
+      Object.assign(instance, cursor.value)
+      result = instance
+    }, transaction)
+
+    return result
   }
 
   /**
@@ -143,26 +199,15 @@ export class Query<T extends Model> {
    * @returns - All the results of the query
    */
   async all(transaction?: IDBTransaction): Promise<T[]> {
-    const cursor = this._getCursor(transaction)
     const result: T[] = []
-    return new Promise<T[]>((resolve, reject) => {
-      cursor.onsuccess = () => {
-        if (!cursor.result) {
-          resolve(result)
-        }
-        else {
-          if (this._fitsFilters(cursor.result.value as T)) {
-            const instance = new this.TargetModel()
-            Object.assign(instance, cursor.result.value)
-            result.push(instance)
-          }
-          cursor.result.continue()
-        }
-      }
-      cursor.onerror = (event) => {
-        reject(event)
-      }
-    })
+
+    await this._cursorLogic((cursor) => {
+      const instance = new this.TargetModel()
+      Object.assign(instance, cursor.value)
+      result.push(instance)
+    }, transaction)
+
+    return result
   }
 
   /**
@@ -170,24 +215,13 @@ export class Query<T extends Model> {
    * @returns - The amount of results of the query
    */
   async count(transaction?: IDBTransaction): Promise<number> {
-    const cursor = this._getCursor(transaction)
     let count = 0
-    return new Promise<number>((resolve, reject) => {
-      cursor.onsuccess = () => {
-        if (!cursor.result) {
-          resolve(count)
-        }
-        else {
-          if (this._fitsFilters(cursor.result.value as T))
-            count++
 
-          cursor.result.continue()
-        }
-      }
-      cursor.onerror = (event) => {
-        reject(event)
-      }
-    })
+    await this._cursorLogic(() => {
+      count += 1
+    }, transaction)
+
+    return count
   }
 
   /**
@@ -195,24 +229,13 @@ export class Query<T extends Model> {
    * @returns - The amount of results deleted
    */
   async delete(transaction?: IDBTransaction): Promise<number> {
-    const cursor = this._getCursor(transaction || 'readwrite')
     let amount = 0
-    return new Promise<number>((resolve, reject) => {
-      cursor.onsuccess = () => {
-        if (!cursor.result) {
-          resolve(amount)
-        }
-        else {
-          if (this._fitsFilters(cursor.result.value as T)) {
-            amount += 1
-            cursor.result.delete()
-          }
-          cursor.result.continue()
-        }
-      }
-      cursor.onerror = (event) => {
-        reject(event)
-      }
-    })
+
+    await this._cursorLogic((cursor) => {
+      cursor.delete()
+      amount += 1
+    }, transaction || 'readwrite')
+
+    return amount
   }
 }

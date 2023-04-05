@@ -276,4 +276,71 @@ describe('Query builder', () => {
     const obtainedTests = await Test.all()
     assert.sameDeepMembers(obtainedTests, [test3])
   })
+  it('should allow filtering with a limit', async () => {
+    class Test extends Model {
+      @Field({ primaryKey: true })
+      id!: number
+
+      @Field()
+      name!: string
+
+      @Field()
+      age!: number
+    }
+
+    await init('test', 1)
+
+    const test1 = await Test.create({ id: 1, name: 'test1', age: 10 })
+    const test2 = await Test.create({ id: 2, name: 'test1', age: 20 })
+    await Test.create({ id: 3, name: 'test3', age: 30 })
+    await Test.create({ id: 4, name: 'test4', age: 10 })
+
+    const obtainedTests = await Test.filter({ age: t => t < 25 }).orderBy('id').limit(2).all()
+    assert.sameDeepMembers(obtainedTests, [test1, test2])
+  })
+  it('should allow filtering with an offset', async () => {
+    class Test extends Model {
+      @Field({ primaryKey: true })
+      id!: number
+
+      @Field()
+      name!: string
+
+      @Field()
+      age!: number
+    }
+
+    await init('test', 1)
+
+    await Test.create({ id: 1, name: 'test1', age: 10 })
+    const test2 = await Test.create({ id: 2, name: 'test1', age: 20 })
+    await Test.create({ id: 3, name: 'test3', age: 30 })
+    const test4 = await Test.create({ id: 4, name: 'test4', age: 10 })
+
+    const obtainedTests = await Test.filter({ age: t => t < 25 }).orderBy('id').offset(1).all()
+    assert.sameDeepMembers(obtainedTests, [test2, test4])
+  })
+  it('should allow setting a limit and an offset', async () => {
+    class Test extends Model {
+      @Field({ primaryKey: true })
+      id!: number
+
+      @Field()
+      name!: string
+
+      @Field()
+      age!: number
+    }
+
+    await init('test', 1)
+
+    await Test.create({ id: 1, name: 'test1', age: 10 })
+    await Test.create({ id: 2, name: 'test1', age: 20 })
+    await Test.create({ id: 3, name: 'test3', age: 30 })
+    const test4 = await Test.create({ id: 4, name: 'test4', age: 10 })
+    await Test.create({ id: 5, name: 'test4', age: 10 })
+
+    const obtainedTests = await Test.orderBy('id').offset(3).limit(1).all()
+    assert.sameDeepMembers(obtainedTests, [test4])
+  })
 })

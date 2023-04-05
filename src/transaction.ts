@@ -1,4 +1,4 @@
-import type { TransactionCallback } from './types'
+import type { TransactionCallback, TransactionOrMode } from './types'
 import { db } from './connection'
 
 /**
@@ -10,8 +10,8 @@ import { db } from './connection'
  */
 export function _objectStore(storeName: string, transaction?: IDBTransaction): IDBObjectStore
 export function _objectStore(storeName: string, mode?: IDBTransactionMode): IDBObjectStore
-export function _objectStore(storeName: string, modeOrTransaction?: IDBTransactionMode | IDBTransaction): IDBObjectStore
-export function _objectStore(storeName: string, modeOrTransaction?: IDBTransactionMode | IDBTransaction): IDBObjectStore {
+export function _objectStore(storeName: string, modeOrTransaction?: TransactionOrMode): IDBObjectStore
+export function _objectStore(storeName: string, modeOrTransaction?: TransactionOrMode): IDBObjectStore {
   if (!db.connected)
     throw new Error('Database is not connected')
   if (modeOrTransaction instanceof IDBTransaction) {
