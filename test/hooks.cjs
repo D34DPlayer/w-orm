@@ -1,4 +1,4 @@
-/* @type {import('mocha').RootHookObject} */
+/** @type {import('mocha').RootHookObject} */
 exports.mochaHooks = {
   beforeAll(done) {
     require('reflect-metadata')

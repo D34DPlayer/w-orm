@@ -5,7 +5,7 @@ import resolve from '@rollup/plugin-node-resolve'
 
 import pkg from './package.json' assert { type: 'json' }
 
-/* @type {import('rollup').RollupOptions} */
+/** @type {import('rollup').RollupOptions} */
 export default {
   input: 'src/index.ts',
   output: [
