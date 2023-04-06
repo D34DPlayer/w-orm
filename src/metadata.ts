@@ -35,6 +35,11 @@ export function _resetMetadata() {
     delete TablesMetadata[tableName]
 }
 
+/**
+ * Helper function to setup the table metadata.
+ * @param instance - The decorator's target
+ * @internal
+ */
 export function _handleTableData<T>(instance: T) {
   if (!instance)
     return
