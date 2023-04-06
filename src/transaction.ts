@@ -1,6 +1,10 @@
 import type { TransactionCallback, TransactionOrMode } from './types'
 import { db } from './connection'
 
+export function _objectStore(storeName: string, transaction?: IDBTransaction): IDBObjectStore
+export function _objectStore(storeName: string, mode?: IDBTransactionMode): IDBObjectStore
+export function _objectStore(storeName: string, modeOrTransaction?: TransactionOrMode): IDBObjectStore
+
 /**
  * Utility function to get an object store from the global database connection
  * @param storeName The name of the object store
@@ -8,9 +12,6 @@ import { db } from './connection'
  * @returns { IDBObjectStore } - The object store
  * @internal
  */
-export function _objectStore(storeName: string, transaction?: IDBTransaction): IDBObjectStore
-export function _objectStore(storeName: string, mode?: IDBTransactionMode): IDBObjectStore
-export function _objectStore(storeName: string, modeOrTransaction?: TransactionOrMode): IDBObjectStore
 export function _objectStore(storeName: string, modeOrTransaction?: TransactionOrMode): IDBObjectStore {
   if (!db.connected)
     throw new Error('Database is not connected')
