@@ -48,7 +48,7 @@ export abstract class Model {
    * @param values - The values to initialize the model with
    * @returns - The new model instance
    */
-  public static async create<T extends Model>(this: { new(): T }, values?: Partial<ModelFields<T>>, transaction?: IDBTransaction): Promise<T> {
+  public static async create<T extends Model>(this: { new(): T }, values: Partial<ModelFields<T>>, transaction?: IDBTransaction): Promise<T> {
     const instance = new this()
     Object.assign(instance, values)
 
