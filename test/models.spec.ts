@@ -291,4 +291,23 @@ describe('Models', () => {
       assert.deepEqual(obtainedTest, createdTest)
     })
   })
+  describe('update', () => {
+    it('should update an instance', async () => {
+      class Test extends Model {
+        @Field({ primaryKey: true })
+        id!: number
+
+        @Field()
+        test!: string
+      }
+
+      await init('test', 1)
+
+      const createdTest = await Test.create({ id: 1, test: 'test' })
+
+      createdTest.update({ test: 'test2' })
+
+      assert.deepEqual(createdTest, { id: 1, test: 'test2' } as Test)
+    })
+  })
 })
