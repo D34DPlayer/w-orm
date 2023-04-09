@@ -343,4 +343,29 @@ describe('Query builder', () => {
     const obtainedTests = await Test.orderBy('id').offset(3).limit(1).all()
     assert.sameDeepMembers(obtainedTests, [test4])
   })
+  it('should allow updating all results', async () => {
+    class Test extends Model {
+      @Field({ primaryKey: true })
+      id!: number
+
+      @Field()
+      name!: string
+
+      @Field()
+      age!: number
+    }
+
+    await init('test', 1)
+
+    await Test.create({ id: 1, name: 'test1', age: 10 })
+    await Test.create({ id: 2, name: 'test1', age: 20 })
+    await Test.create({ id: 3, name: 'test1', age: 30 })
+
+    await Test.filter({ age: t => t < 25 }).update({ name: 'test2' })
+
+    await Test.filter({ name: 'test1' }).delete()
+
+    const obtainedTests = await Test.all()
+    assert.lengthOf(obtainedTests, 2)
+  })
 })
