@@ -368,4 +368,81 @@ describe('Query builder', () => {
     const obtainedTests = await Test.all()
     assert.lengthOf(obtainedTests, 2)
   })
+  it('should allow looping over all results', async () => {
+    class Test extends Model {
+      @Field({ primaryKey: true })
+      id!: number
+
+      @Field()
+      name!: string
+
+      @Field()
+      age!: number
+    }
+
+    await init('test', 1)
+
+    await Test.create({ id: 1, name: 'test1', age: 10 })
+    await Test.create({ id: 2, name: 'test1', age: 20 })
+    await Test.create({ id: 3, name: 'test1', age: 30 })
+
+    const results = [] as number[]
+    await Test.filter({ age: t => t < 25 }).orderBy('-age').forEach(async (instance) => {
+      results.push(instance.age)
+    })
+
+    assert.sameDeepMembers(results, [20, 10])
+  })
+  it('should allow looping with complex usage', async () => {
+    class Test extends Model {
+      @Field({ primaryKey: true })
+      id!: number
+
+      @Field()
+      name!: string
+
+      @Field()
+      age!: number
+    }
+
+    await init('test', 1)
+
+    await Test.create({ id: 1, name: 'test1', age: 10 })
+    await Test.create({ id: 2, name: 'test1', age: 20 })
+    await Test.create({ id: 3, name: 'test1', age: 30 })
+
+    await Test.filter({ age: t => t < 25 }).orderBy('-age').forEach(async (t, tx) => {
+      t.update({ name: 'test2' })
+      await t.save(tx)
+    }, 'readwrite')
+
+    const amount = await Test.filter({ name: 'test2' }).count()
+    assert.equal(amount, 2)
+  })
+  it('should allow ending a loop early', async () => {
+    class Test extends Model {
+      @Field({ primaryKey: true })
+      id!: number
+
+      @Field()
+      name!: string
+
+      @Field()
+      age!: number
+    }
+
+    await init('test', 1)
+
+    await Test.create({ id: 1, name: 'test1', age: 10 })
+    await Test.create({ id: 2, name: 'test1', age: 20 })
+    await Test.create({ id: 3, name: 'test1', age: 30 })
+    await Test.create({ id: 4, name: 'test1', age: 40 })
+
+    let count = 0
+    await Test.forEach(async () => {
+      return count++ === 1
+    })
+
+    assert(count === 2)
+  })
 })

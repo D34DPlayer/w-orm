@@ -61,3 +61,7 @@ export type OrderBy<T extends Model> = (ModelFieldKey<T>) | `-${ModelFieldKey<T>
 export type TransactionCallback = (tx: IDBTransaction) => Promise<void>
 
 export type TransactionOrMode = IDBTransaction | IDBTransactionMode
+
+export type CursorCallback = (value: IDBCursorWithValue, tx: IDBTransaction) => Promise<boolean | void>
+
+export type ForEachCallback<T> = (instance: T, tx: IDBTransaction) => boolean | void | Promise<boolean | void>

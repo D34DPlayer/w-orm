@@ -7,5 +7,6 @@ module.exports = {
     'no-console': 'warn',
     '@typescript-eslint/no-inferrable-types': 'off',
     'unused-imports/no-unused-vars': 'off',
+    '@typescript-eslint/require-await': 'off',
   },
 }
