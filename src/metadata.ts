@@ -1,6 +1,7 @@
 import type { FieldOptions, TableMetadata } from './types'
 import { db } from './connection'
 import type { Model } from './models'
+import { ConnectionError, WormError } from './errors'
 
 /**
  * Global object storing the tables and their fields definitions.
@@ -22,7 +23,7 @@ export const TablesMetadata: Record<string, TableMetadata> = {}
  */
 export function _addFieldToMetadata<T>(tableName: string, fieldName: string, options: FieldOptions<T>) {
   if (!TablesMetadata[tableName])
-    throw new Error(`Table ${tableName} is not defined`)
+    throw new WormError(`Table ${tableName} is not defined`)
   TablesMetadata[tableName].fields[fieldName] = options
 }
 
@@ -55,7 +56,7 @@ export function _handleTableData<T>(instance: T) {
     const parentMetadata = TablesMetadata[parentName]
 
     if (!parentMetadata)
-      throw new Error(`Parent table ${parentName} is not defined`)
+      throw new WormError(`Parent table ${parentName} is not defined`)
 
     TablesMetadata[tableName] = {
       fields: { ...parentMetadata.fields },
@@ -101,7 +102,7 @@ export function getPrimaryKeys(tableName: string): string[] {
  */
 export function createTables(): void {
   if (!db.connected)
-    throw new Error('Database is not connected')
+    throw new ConnectionError('Database is not connected')
   for (const tableName in TablesMetadata) {
     if (TablesMetadata[tableName].abstract)
       continue

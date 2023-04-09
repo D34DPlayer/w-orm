@@ -1,5 +1,6 @@
 import type { TransactionCallback, TransactionOrMode } from './types'
 import { db } from './connection'
+import { ConnectionError } from './errors'
 
 export function _objectStore(storeName: string, tx?: IDBTransaction): IDBObjectStore
 export function _objectStore(storeName: string, mode?: IDBTransactionMode): IDBObjectStore
@@ -14,7 +15,7 @@ export function _objectStore(storeName: string, txOrMode?: TransactionOrMode): I
  */
 export function _objectStore(storeName: string, txOrMode?: TransactionOrMode): IDBObjectStore {
   if (!db.connected)
-    throw new Error('Database is not connected')
+    throw new ConnectionError('Database is not connected')
   if (txOrMode instanceof IDBTransaction) {
     return txOrMode.objectStore(storeName)
   }
@@ -45,7 +46,7 @@ export function _objectStore(storeName: string, txOrMode?: TransactionOrMode): I
  */
 export async function Transaction(mode: IDBTransactionMode, transactionCallback: TransactionCallback): Promise<void> {
   if (!db.connected)
-    throw new Error('Database is not connected')
+    throw new ConnectionError('Database is not connected')
   const stores = Array.from(db.session.objectStoreNames)
 
   const transaction = db.session.transaction(stores, mode)

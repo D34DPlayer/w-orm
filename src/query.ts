@@ -1,6 +1,7 @@
 import type { CursorCallback, Filter, ForEachCallback, ModelFieldKey, ModelFields, OrderBy, TransactionOrMode } from './types'
 import type { Model } from './models'
 import { _objectStore } from './transaction'
+import { WormError } from './errors'
 
 export class Query<T extends Model> {
   /** The filters to apply to the query */
@@ -149,7 +150,7 @@ export class Query<T extends Model> {
 
       request.onsuccess = async () => {
         if (!request.transaction) {
-          reject(new Error('No transaction found'))
+          reject(new WormError('No transaction found'))
           return
         }
         // Done iterating
