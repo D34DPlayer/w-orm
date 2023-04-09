@@ -198,4 +198,12 @@ export abstract class Model {
       }
     })
   }
+
+  /**
+   * Update this instance's fields. This will not save the changes to the database.
+   * @param values - The values to update
+   */
+  public update(values: Partial<ModelFields<this>>): void {
+    Object.assign(this, values)
+  }
 }
