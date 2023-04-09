@@ -2,6 +2,7 @@ import type { Filter, ForEachCallback, ModelFields, OrderBy } from './types'
 import { TablesMetadata, getPrimaryKeys } from './metadata'
 import { _objectStore } from './transaction'
 import { Query } from './query'
+import { ModelError } from './errors'
 
 /**
  * Base class for all models.
@@ -54,7 +55,7 @@ export abstract class Model {
 
     const tableDef = TablesMetadata[this.name]
     if (!tableDef)
-      throw new Error(`Table definition for ${this.name} not found`)
+      throw new ModelError(`Table definition for ${this.name} not found`)
 
     for (const [field, fieldOpts] of Object.entries(tableDef.fields)) {
       // Check if field is defined
@@ -69,7 +70,7 @@ export abstract class Model {
         }
         else
         if (!fieldOpts.nullable) {
-          throw new Error(`Field ${field} is not nullable`)
+          throw new ModelError(`Field ${field} is not nullable`)
         }
       }
     }

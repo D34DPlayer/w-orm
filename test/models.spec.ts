@@ -62,7 +62,7 @@ describe('Models', () => {
       await Test.create({ id: 1 }).then(() => {
         assert.fail('Should not be able to create a non-nullable field without a value')
       }).catch((err: Error) => {
-        assert.match(err.message, /not nullable/)
+        assert.equal(err.name, 'ModelError')
       })
     })
     it('should use default values', async () => {
