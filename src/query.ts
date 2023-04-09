@@ -1,4 +1,4 @@
-import type { Filter, ModelFieldKey, OrderBy, TransactionOrMode } from './types'
+import type { Filter, ModelFieldKey, ModelFields, OrderBy, TransactionOrMode } from './types'
 import type { Model } from './models'
 import { _objectStore } from './transaction'
 
@@ -233,6 +233,23 @@ export class Query<T extends Model> {
 
     await this._cursorLogic((cursor) => {
       cursor.delete()
+      amount += 1
+    }, transaction || 'readwrite')
+
+    return amount
+  }
+
+  /**
+   * Executes the query and updates all the results.
+   * @param updates - The updates to apply to the results
+   * @returns - The amount of results updated
+   */
+  async update(updates: Partial<ModelFields<T>>, transaction?: IDBTransaction): Promise<number> {
+    let amount = 0
+
+    await this._cursorLogic((cursor) => {
+      Object.assign(cursor.value, updates)
+      cursor.update(cursor.value)
       amount += 1
     }, transaction || 'readwrite')
 
