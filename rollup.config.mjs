@@ -2,6 +2,7 @@ import json from '@rollup/plugin-json'
 import typescript from '@rollup/plugin-typescript'
 import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
+import cleanup from 'rollup-plugin-cleanup'
 
 import pkg from './package.json' assert { type: 'json' }
 
@@ -21,5 +22,6 @@ export default {
     typescript({ declaration: true, declarationDir: 'types', module: 'ESNext' }),
     commonjs(),
     resolve(),
+    cleanup({ extensions: ['js', 'ts'] }),
   ],
 }
