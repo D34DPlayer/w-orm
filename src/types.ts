@@ -65,3 +65,7 @@ export type TransactionOrMode = IDBTransaction | IDBTransactionMode
 export type CursorCallback = (value: IDBCursorWithValue, tx: IDBTransaction) => Promise<boolean | void>
 
 export type ForEachCallback<T> = (instance: T, tx: IDBTransaction) => boolean | void | Promise<boolean | void>
+
+export type TableDefinition = Record<string, Partial<FieldOptions<unknown>>>
+
+export type Constructor<T> = Function & { prototype: T }
