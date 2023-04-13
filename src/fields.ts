@@ -1,6 +1,7 @@
-import type { FieldOptions } from './types'
+import type { Constructor, FieldOptions, TableDefinition } from './types'
 import { _addFieldToMetadata, _handleTableData } from './metadata'
 import { ModelError, WormError } from './errors'
+import type { Model } from './models'
 
 /**
  * Describes a field on a model.
@@ -43,7 +44,13 @@ export function Field<T>(options: Partial<FieldOptions<T>> = {}): PropertyDecora
       throw new WormError('Field decorator doesn\'t support symbols')
 
     // Use "emitDecoratorMetadata" to get the type of the field
-    const type = Reflect.getMetadata('design:type', object, propertyName) as () => T
+    let t: () => T
+    try {
+      t = (Reflect.getMetadata('design:type', object, propertyName) || Object) as () => T
+    }
+    catch {
+      t = Object
+    }
 
     if (options.primaryKey && options.nullable)
       throw new ModelError('Primary key cannot be nullable')
@@ -53,11 +60,24 @@ export function Field<T>(options: Partial<FieldOptions<T>> = {}): PropertyDecora
       primaryKey: false,
       unique: false,
       nullable: !options.primaryKey,
-      type,
+      type: t,
       ...options,
     }
 
     _handleTableData(object)
     _addFieldToMetadata(object.constructor.name, propertyName, newOptions)
+  }
+}
+
+/**
+ * Create a new model from a definition.
+ * @param name - The name of the model
+ * @param definition - The definition of the model
+ * @returns - The new model
+ */
+export function defineModel<T extends Model>(modelClass: Constructor<T>, definition: TableDefinition) {
+  for (const field in definition) {
+    const fieldOpts = definition[field]
+    Field(fieldOpts)(modelClass.prototype as T, field)
   }
 }
