@@ -1,3 +1,7 @@
+/**
+ * @module Errors
+ */
+
 export class WormError extends Error {
   constructor(message: string) {
     super(message)
