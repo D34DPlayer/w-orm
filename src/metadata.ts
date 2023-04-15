@@ -52,7 +52,7 @@ export function _handleTableData<T>(instance: T) {
 
   const parentName = (Object.getPrototypeOf(instance.constructor) as typeof Model).name
 
-  if (parentName !== 'Model') {
+  if (parentName in TablesMetadata) {
     const parentMetadata = TablesMetadata[parentName]
 
     if (!parentMetadata)
