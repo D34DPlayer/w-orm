@@ -2,6 +2,7 @@
  * @module Types
  */
 import type { Model } from './models'
+import type { MigrationContext } from './migration'
 
 export interface DisconnectedDB {
   connected: false
@@ -70,3 +71,7 @@ export type ForEachCallback<T> = (instance: T, tx: IDBTransaction) => boolean | 
 export type TableDefinition = Record<string, Partial<FieldOptions<unknown>>>
 
 export type Constructor<T> = Function & { prototype: T }
+
+export type Migration = (migration: MigrationContext) => Promise<void>
+
+export type MigrationList = Record<number, Migration>
