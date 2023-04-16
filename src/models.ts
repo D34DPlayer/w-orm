@@ -1,4 +1,4 @@
-import type { Filter, ForEachCallback, ModelFields, OrderBy } from './types'
+import type { Filter, ForEachCallback, OrderBy } from './types'
 import { TablesMetadata, getPrimaryKeys } from './metadata'
 import { _objectStore } from './transaction'
 import { Query } from './query'
@@ -44,17 +44,23 @@ import { ModelError } from './errors'
  * await newTable.delete()
  * ```
  */
-export abstract class Model {
+export abstract class Model implements Record<string, any> {
+  /** Allows setting extra elements in a model, since this is allowed by IDB */
+  [x: string]: any
+
   /**
    * Create a new model instance.
    * @param values - The values to initialize the model with
    * @returns - The new model instance
    */
-  public static async create<T extends Model>(this: { new(): T }, values: Partial<ModelFields<T>>, tx?: IDBTransaction): Promise<T> {
+  public static async create<T extends Model>(this: { new(): T }, values: Partial<T>, tx?: IDBTransaction): Promise<T> {
     const instance = new this()
     Object.assign(instance, values)
 
-    const tableDef = TablesMetadata[this.name]
+    const tableDef = TablesMetadata[this.name] || {
+      fields: {},
+    }
+
     if (!tableDef)
       throw new ModelError(`Table definition for ${this.name} not found`)
 
@@ -230,7 +236,7 @@ export abstract class Model {
    * Update this instance's fields. This will not save the changes to the database.
    * @param values - The values to update
    */
-  public update(values: Partial<ModelFields<this>>): void {
+  public update(values: Partial<this>): void {
     Object.assign(this, values)
   }
 
