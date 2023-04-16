@@ -112,7 +112,8 @@ export function createTables(): void {
     const store = db.session.createObjectStore(tableName, { keyPath: primaryKeys })
     for (const fieldName in tableFields) {
       const field = tableFields[fieldName]
-      store.createIndex(fieldName, fieldName, { unique: field.unique })
+      if (field.index)
+        store.createIndex(fieldName, fieldName, { unique: field.unique })
     }
   }
 }

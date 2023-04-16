@@ -29,6 +29,7 @@ export interface FieldOptions<T> {
   nullable: boolean
   default?: T | (() => T)
   type: () => T
+  index: boolean
 }
 
 /** {@inheritDoc W-ORM.TablesMetadata } */

@@ -101,6 +101,22 @@ describe('Fields', () => {
       const store = _objectStore('Test')
       assert.sameMembers((store.keyPath as string[]), ['id', 'test'])
     })
+    it('should allow not creating an index', async () => {
+      class Test extends Model {
+        @Field({ primaryKey: true })
+        id!: number
+
+        @Field({ index: false })
+        test!: string
+      }
+
+      await init('test', 1)
+
+      const store = _objectStore('Test')
+
+      assert(store.indexNames.contains('id'))
+      assert(!store.indexNames.contains('test'))
+    })
   })
   describe('Define table helper', () => {
     it('should be able to set a field as primary key', async () => {
@@ -188,6 +204,23 @@ describe('Fields', () => {
 
       const store = _objectStore('Test')
       assert.sameMembers((store.keyPath as string[]), ['id', 'test'])
+    })
+    it('should allow not creating an index', async () => {
+      class Test extends Model {
+        id!: number
+        test!: string
+      }
+      defineModel(Test, {
+        id: { primaryKey: true },
+        test: { index: false },
+      })
+
+      await init('test', 1)
+
+      const store = _objectStore('Test')
+
+      assert(store.indexNames.contains('id'))
+      assert(!store.indexNames.contains('test'))
     })
   })
 })
