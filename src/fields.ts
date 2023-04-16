@@ -61,6 +61,7 @@ export function Field<T>(options: Partial<FieldOptions<T>> = {}): PropertyDecora
       unique: false,
       nullable: !options.primaryKey,
       type: t,
+      index: true,
       ...options,
     }
 
