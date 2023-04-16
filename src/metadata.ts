@@ -110,10 +110,30 @@ export function createTables(): void {
     const tableFields = TablesMetadata[tableName].fields
     const primaryKeys = getPrimaryKeys(tableName)
     const store = db.session.createObjectStore(tableName, { keyPath: primaryKeys })
-    for (const fieldName in tableFields) {
-      const field = tableFields[fieldName]
-      if (field.index)
-        store.createIndex(fieldName, fieldName, { unique: field.unique })
+
+    const currentIndexes = new Set(store.indexNames)
+    const newIndexNames = new Set(Object.keys(tableFields).filter(fieldName => tableFields[fieldName].index))
+
+    for (const oldIndex of currentIndexes) {
+      if (!newIndexNames.has(oldIndex))
+        store.deleteIndex(oldIndex)
+    }
+
+    for (const newIndex in newIndexNames) {
+      const field = tableFields[newIndex]
+      if (currentIndexes.has(newIndex)) {
+        const index = store.index(newIndex)
+        if (!compareIndex(index, field))
+          store.deleteIndex(newIndex)
+        else
+          continue
+      }
+
+      store.createIndex(newIndex, newIndex, { unique: field.unique })
     }
   }
+}
+
+export function compareIndex(index: IDBIndex, field: FieldOptions<unknown>): boolean {
+  return index.unique === field.unique
 }
