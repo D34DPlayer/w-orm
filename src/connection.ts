@@ -33,7 +33,7 @@ function _updateDB(_db: IDBDatabase, dbName: string, version: number) {
  * Three scenarios are possible:
  * 1. There's already a connection, we reuse it
  * 2. There's no version bump, a new connection is created
- * 3. There's a version bump, a new connection is created and tables created
+ * 3. There's a version bump, a new connection is created, migrations are applied and tables created
  *
  * @example
  * ```js
@@ -116,6 +116,7 @@ export async function deleteDB(dbName: string): Promise<Event> {
 export function disconnect(): void {
   if (!db.connected)
     return
+
   db.session.close()
   Object.assign(db, {
     connected: false,

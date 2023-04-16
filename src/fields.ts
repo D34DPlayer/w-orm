@@ -13,6 +13,7 @@ import type { Model } from './models'
  *  - `nullable`: Whether the field can be null, primary keys cannot be nullable.
  *  - `default`: The default value of the field, it can be a value or a function that returns the value.
  *  - `type`: The type of the field, it is automatically inferred with typescript.
+ *  - `index`: Whether the field should be indexed, it is recommended to keep it unless the type isn't indexable (eg. a Blob).
  *
  * @default
  * ```js
@@ -34,6 +35,8 @@ import type { Model } from './models'
  *   balance: number
  *   @Field({ default: () => new Date() })
  *   createdAt: Date
+ *   @Field({ index: false })
+ *   profilePicture: Blob
  * }
  * ```
  * @param options
@@ -72,9 +75,23 @@ export function Field<T>(options: Partial<FieldOptions<T>> = {}): PropertyDecora
 
 /**
  * Create a new model from a definition.
+ * Allows defining models without using the decorator syntax.
+ *
  * @param name - The name of the model
  * @param definition - The definition of the model
  * @returns - The new model
+ *
+ * @example
+ * ```ts
+ * class NewTable extends Model {
+ *  id!: number
+ *  name!: string
+ * }
+ * defineModel(NewTable, {
+ *   id: { primaryKey: true },
+ *   name: { unique: true },
+ * })
+ * ```
  */
 export function defineModel<T extends Model>(modelClass: Constructor<T>, definition: TableDefinition) {
   for (const field in definition) {

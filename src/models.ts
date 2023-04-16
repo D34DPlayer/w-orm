@@ -6,6 +6,7 @@ import { ModelError } from './errors'
 
 /**
  * Base class for all models.
+ * All DB operations allow providing a transaction to be used.
  *
  * @see {@link Field} for more information about fields
  * @see {@link Query} for more information about querying the database
@@ -124,7 +125,20 @@ export abstract class Model {
 
   /**
    * Loop through all model instances.
+   * @see {@link Query.forEach} for more information
+   *
    * @param callback - The callback to call for each model instance
+   * @example
+   * ```ts
+   * // Simple loop
+   * await User.forEach((user) => {
+   *  console.log(user.name)
+   * })
+   * // Loop with async callback
+   * await User.forEach(async (user, tx) => {
+   *   await user.delete(tx)
+   * })
+   * ```
    */
   public static async forEach<T extends Model>(this: { new(): T }, callback: ForEachCallback<T>, tx?: IDBTransaction): Promise<void> {
     return (new Query(this)).forEach(callback, tx)
@@ -149,6 +163,8 @@ export abstract class Model {
 
   /**
    * Start a query for this model with a filter.
+   * @see {@link Query.filter} for more information
+   *
    * @param filters - The filters to apply
    * @returns - The new query
    */
@@ -158,6 +174,8 @@ export abstract class Model {
 
   /**
    * Start a query for this model with an order.
+   * @see {@link Query.orderBy} for more information
+   *
    * @param orderBy - The field to order by, prepend a `-` to reverse the order
    * @returns - The new query
    */
@@ -214,5 +232,13 @@ export abstract class Model {
    */
   public update(values: Partial<ModelFields<this>>): void {
     Object.assign(this, values)
+  }
+
+  /**
+   * Deletes all the rows in the table.
+   */
+  public static clear(tx?: IDBTransaction): void {
+    const store = _objectStore(this.constructor.name, tx || 'readwrite')
+    store.clear()
   }
 }

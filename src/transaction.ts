@@ -29,6 +29,13 @@ export function _objectStore(storeName: string, txOrMode?: TransactionOrMode): I
  * Starts a db transaction.
  * Depending on the result of the transactionCallback, the transaction will be committed or aborted.
  *
+ * Because of a limitation in the IndexedDB API, the transaction will be automatically committed
+ * if we wait for any non transactional operation. (e.g. fetching some data from the network).
+ *
+ * This means, that even though the transactionCallback is async, it should not await any non transactional operation.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/IDBTransaction
+ *
  * @example
  * ```ts
  * await Transaction('readwrite', async (tx) => {
