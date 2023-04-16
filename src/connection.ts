@@ -1,5 +1,6 @@
-import type { DB, InitResponse } from './types'
+import type { DB, InitResponse, MigrationList } from './types'
 import { createTables } from './metadata'
+import { MigrationContext } from './migration'
 
 // TODO: Support multiple connections
 /**
@@ -45,7 +46,7 @@ function _updateDB(_db: IDBDatabase, dbName: string, version: number) {
  * @param version - The database version, a version bump will trigger an upgrade
  * @returns {Promise<InitResponse>} - The database connection and whether an upgrade was performed
  */
-export async function init(dbName: string, version: number): Promise<InitResponse> {
+export async function init(dbName: string, version: number, migrations?: MigrationList): Promise<InitResponse> {
   return new Promise<InitResponse>((resolve, reject) => {
     if (db.connected) {
       resolve({
@@ -68,18 +69,18 @@ export async function init(dbName: string, version: number): Promise<InitRespons
       })
     }
 
-    request.onupgradeneeded = (_) => {
+    request.onupgradeneeded = async (ev: IDBVersionChangeEvent) => {
+      if (!request.transaction)
+        throw new Error('No transaction available during upgrade')
+
       _updateDB(request.result, dbName, version)
+
+      const ctx = new MigrationContext(request.result, request.transaction, migrations || {})
+
+      await ctx.runMigrations(ev.oldVersion, ev.newVersion)
+
       createTables()
-      if (request.transaction) {
-        request.transaction.oncomplete = () => {
-          resolve({
-            session: request.result,
-            upgraded: true,
-          })
-        }
-      }
-      else {
+      request.transaction.oncomplete = () => {
         resolve({
           session: request.result,
           upgraded: true,
