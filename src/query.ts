@@ -1,4 +1,4 @@
-import type { CursorCallback, Filter, ForEachCallback, ModelFieldKey, ModelFields, OrderBy, TransactionOrMode } from './types'
+import type { CursorCallback, Filter, ForEachCallback, ModelFieldKey, OrderBy, TransactionOrMode } from './types'
 import type { Model } from './models'
 import { _objectStore } from './transaction'
 import { WormError } from './errors'
@@ -146,6 +146,7 @@ export class Query<T extends Model> {
     for (const [key, value] of Object.entries(this.filters)) {
       if (typeof value === 'function') {
         // If the value is a function, we call it with the instance's value
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         if (!value(instance[key as keyof T]))
           return false
         continue
@@ -326,7 +327,7 @@ export class Query<T extends Model> {
    * const amount = await User.filter({ name: 'John' }).update({ name: 'Jane' })
    * ```
    */
-  async update(updates: Partial<ModelFields<T>>, tx?: IDBTransaction): Promise<number> {
+  async update(updates: Partial<T>, tx?: IDBTransaction): Promise<number> {
     let amount = 0
 
     await this._cursorLogic((cursor) => {

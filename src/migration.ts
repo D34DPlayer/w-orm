@@ -4,6 +4,7 @@ type MigrationItem = [number, Migration]
 
 /**
  * Context passed to migrations.
+ * @see {@link Types.MigrationList}: For more information on migrations
  */
 export class MigrationContext {
   private migrations: MigrationItem[]
