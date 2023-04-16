@@ -34,6 +34,12 @@ export class Query<T extends Model> {
    * This will not reset the filters, but will merge the new filters with the old ones.
    * @param filters - The new filters to apply to the query
    * @returns - The query itself, to allow chaining
+   *
+   * @example
+   * ```
+   * // Get all users with the name "John" and the age 20
+   * const query = User.filter({ name: 'John' }).filter({ age: 20 })
+   * ```
    */
   public filter(filters: Filter<T>): Query<T> {
     Object.assign(this.filters, filters)
@@ -43,6 +49,13 @@ export class Query<T extends Model> {
   /**
    * Reset the filters of the query.
    * @returns - The query itself, to allow chaining
+   *
+   * @example
+   * ```ts
+   * // Get all users with the name "John"
+   * const query = User.filter({ name: 'John' })
+   * // Get all users
+   * query.resetFilters()
    */
   public resetFilters(): Query<T> {
     this.filters = {} as Filter<T>
@@ -53,6 +66,13 @@ export class Query<T extends Model> {
    * Update the field used to order the query.
    * @param field - The field to order the query by, prepend with `-` to reverse the order
    * @returns - The query itself, to allow chaining
+   *
+   * @example
+   * ```ts
+   * // Get all users ordered by their name ascending
+   * const query = User.orderBy('name')
+   * // Get all users ordered by their name descending
+   * const query = User.orderBy('-name')
    */
   public orderBy(field: OrderBy<T>): Query<T> {
     if (field.startsWith('-')) {
@@ -69,6 +89,14 @@ export class Query<T extends Model> {
   /**
    * Change the order of the query.
    * @returns - The query itself, to allow chaining
+   *
+   * @example
+   * ```ts
+   * // Get all users ordered by their name ascending
+   * const query = User.orderBy('name')
+   * // Get all users ordered by their name descending
+   * query.reverse()
+   * ```
    */
   public reverse(): Query<T> {
     this._reverse = !this._reverse
@@ -80,6 +108,12 @@ export class Query<T extends Model> {
    * This means that the query will only return a maximum of `limit` items.
    * @param limit - The maximum amount of items to return
    * @returns - The query itself, to allow chaining
+   *
+   * @example
+   * ```ts
+   * // Get the first 10 users
+   * const query = User.limit(10)
+   * ```
    */
   public limit(limit: number): Query<T> {
     this._limit = limit
@@ -91,6 +125,12 @@ export class Query<T extends Model> {
    * This means that the query will skip the first `offset` items.
    * @param offset - The amount of items to skip
    * @returns - The query itself, to allow chaining
+   *
+   * @example
+   * ```ts
+   * // Get all users except the second page of 10 users
+   * const query = User.limit(10).offset(10)
+   * ```
    */
   public offset(offset: number): Query<T> {
     this._skip = offset
@@ -190,6 +230,11 @@ export class Query<T extends Model> {
   /**
    * Executes the query and returns the first result.
    * @returns - The first result of the query, or null if no result was found
+   *
+   * @example
+   * ```ts
+   * // Get the first user with the name "John"
+   * const query = User.filter({ name: 'John' }).first()
    */
   async first(tx?: IDBTransaction): Promise<T | null> {
     let result: T | null = null
@@ -207,6 +252,12 @@ export class Query<T extends Model> {
   /**
    * Executes the query and returns all the results.
    * @returns - All the results of the query
+   *
+   * @example
+   * ```ts
+   * // Get all users with the name "John"
+   * const users = await User.filter({ name: 'John' }).all()
+   * ```
    */
   async all(tx?: IDBTransaction): Promise<T[]> {
     const result: T[] = []
@@ -224,6 +275,12 @@ export class Query<T extends Model> {
   /**
    * Executes the query and returns the number of results.
    * @returns - The amount of results of the query
+   *
+   * @example
+   * ```ts
+   * // Get the amount of users with the name "John"
+   * const amount = await User.filter({ name: 'John' }).count()
+   * ```
    */
   async count(tx?: IDBTransaction): Promise<number> {
     let count = 0
@@ -239,6 +296,12 @@ export class Query<T extends Model> {
   /**
    * Executes the query and deletes all the results.
    * @returns - The amount of results deleted
+   *
+   * @example
+   * ```ts
+   * // Delete all users with the name "John"
+   * const amount = await User.filter({ name: 'John' }).delete()
+   * ```
    */
   async delete(tx?: IDBTransaction): Promise<number> {
     let amount = 0
@@ -256,6 +319,12 @@ export class Query<T extends Model> {
    * Executes the query and updates all the results.
    * @param updates - The updates to apply to the results
    * @returns - The amount of results updated
+   *
+   * @example
+   * ```ts
+   * // Update all users with the name "John" to have the name "Jane"
+   * const amount = await User.filter({ name: 'John' }).update({ name: 'Jane' })
+   * ```
    */
   async update(updates: Partial<ModelFields<T>>, tx?: IDBTransaction): Promise<number> {
     let amount = 0
@@ -272,8 +341,29 @@ export class Query<T extends Model> {
 
   /**
    * Loops over the results of the query.
+   * This is useful if you want to do something with each result, but don't want to wait for all the results to be fetched.
+   * This is also useful if you want to modify the database while iterating over the results.
+   * Any operation should use the same transaction as the one passed to the callback.
+   *
+   * If the callback returns true, the loop will stop.
+   *
+   * @see {Transaction}: For some limitations of this system
+   *
    * @param callback - The callback to call for each result
    * @param txOrMode - The transaction or mode to use, make sure to use 'readwrite' if you want to modify the database
+   *
+   * @example
+   * ```ts
+   * // Log all users with the name "John"
+   * await User.filter({ name: 'John' }).forEach((user) => {
+   *   console.log(user)
+   * })
+   * // Log all users with the name "John" and delete them
+   * await User.filter({ name: 'John' }).forEach(async (user, tx) => {
+   *   console.log(user)
+   *  await user.delete(tx)
+   * })
+   * ```
    */
   async forEach(callback: ForEachCallback<T>, txOrMode: TransactionOrMode = 'readonly'): Promise<void> {
     await this._cursorLogic(async (cursor, tx) => {

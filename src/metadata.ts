@@ -5,7 +5,7 @@ import { ConnectionError, WormError } from './errors'
 
 /**
  * Global object storing the tables and their fields definitions.
- * It is populated by all the {@link Field} decorators used in the application.
+ * It is populated by all the {@link Field} decorators used in the application, or by calling {@link defineModel}
  *
  * It should be treated as read-only, even though it is not.
  *
@@ -37,7 +37,7 @@ export function _resetMetadata() {
 }
 
 /**
- * Helper function to setup the table metadata.
+ * Helper function to setup a table's metadata.
  * @param instance - The decorator's target
  * @internal
  */
@@ -123,7 +123,7 @@ export function createTables(): void {
       const field = tableFields[newIndex]
       if (currentIndexes.has(newIndex)) {
         const index = store.index(newIndex)
-        if (!compareIndex(index, field))
+        if (!_compareIndex(index, field))
           store.deleteIndex(newIndex)
         else
           continue
@@ -134,6 +134,13 @@ export function createTables(): void {
   }
 }
 
-export function compareIndex(index: IDBIndex, field: FieldOptions<unknown>): boolean {
+/**
+ * Compares an index with a field's options.
+ * @param index - The index to compare
+ * @param field - The field's options
+ * @returns - True if the index and the field's options are the same
+ * @internal
+ */
+export function _compareIndex(index: IDBIndex, field: FieldOptions<unknown>): boolean {
   return index.unique === field.unique
 }
