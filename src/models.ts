@@ -61,9 +61,6 @@ export abstract class Model implements Record<string, any> {
       fields: {},
     }
 
-    if (!tableDef)
-      throw new ModelError(`Table definition for ${this.name} not found`)
-
     for (const [field, fieldOpts] of Object.entries(tableDef.fields)) {
       // Check if field is defined
       if (instance[(field as keyof T)] === undefined) {
