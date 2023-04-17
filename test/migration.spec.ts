@@ -66,6 +66,9 @@ describe('Migration system', () => {
       { id: 1, name: '1 name' },
       { id: 2, name: '2 name' },
     ] as Test2[])
+
+    const store = _objectStore('Test')
+    assert(store.indexNames.contains('name'), 'Index "name" should have been created')
     // #endregion Second version
   })
   it('should be able to remove a field', async () => {
@@ -105,6 +108,46 @@ describe('Migration system', () => {
     await init('test', 2)
 
     const store = _objectStore('Test')
-    assert(!store.indexNames.contains('name'))
+    assert(!store.indexNames.contains('name'), 'Index "name" should have been removed')
+  })
+  it('should fail when the primary key has been changed', async () => {
+    // First version
+    class Test1 extends Model {
+      id!: number
+    }
+    Object.defineProperty(Test1, 'name', { value: 'Test' })
+    defineModel(Test1, {
+      id: { primaryKey: true },
+    })
+
+    await init('test', 1)
+
+    // We also add the unindexed field "name" to be able to add it later
+    await Test1.create({ id: 1, name: '1 name' })
+    await Test1.create({ id: 2, name: '2 name' })
+
+    // Simulate a page reload
+    disconnect()
+    _resetMetadata()
+
+    // Second version
+    class Test2 extends Model {
+      id!: number
+      name!: string
+    }
+    Object.defineProperty(Test2, 'name', { value: 'Test' })
+    defineModel(Test2, {
+      id: { primaryKey: true },
+      name: { primaryKey: true },
+    })
+
+    await new Promise<void>((resolve, reject) => {
+      init('test', 2).then(() => {
+        reject(new Error('Should have failed'))
+      }).catch((e: Error) => {
+        assert.match(e.message, /different primary key/)
+        resolve()
+      })
+    })
   })
 })
