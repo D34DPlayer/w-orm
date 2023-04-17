@@ -111,17 +111,17 @@ export function createTables(): void {
     const primaryKeys = getPrimaryKeys(tableName)
     const store = db.session.createObjectStore(tableName, { keyPath: primaryKeys })
 
-    const currentIndexes = new Set(store.indexNames)
-    const newIndexNames = new Set(Object.keys(tableFields).filter(fieldName => tableFields[fieldName].index))
+    const oldIndexes = new Set(store.indexNames)
+    const newIndexes = new Set(Object.keys(tableFields).filter(fieldName => tableFields[fieldName].index))
 
-    for (const oldIndex of currentIndexes) {
-      if (!newIndexNames.has(oldIndex))
+    for (const oldIndex of oldIndexes) {
+      if (!newIndexes.has(oldIndex))
         store.deleteIndex(oldIndex)
     }
 
-    for (const newIndex in newIndexNames) {
+    for (const newIndex of newIndexes) {
       const field = tableFields[newIndex]
-      if (currentIndexes.has(newIndex)) {
+      if (oldIndexes.has(newIndex)) {
         const index = store.index(newIndex)
         if (!_compareIndex(index, field))
           store.deleteIndex(newIndex)
