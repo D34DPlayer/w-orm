@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 import { db, disconnect, init } from '../src/connection'
-import { defineModel } from '../src/fields'
+import { Field, defineModel } from '../src/fields'
 import { Model } from '../src/models'
 import { _resetMetadata } from '../src/metadata'
 import type { MigrationList } from '../src/types'
@@ -149,5 +149,50 @@ describe('Migration system', () => {
         resolve()
       })
     })
+  })
+  it('should expose table names', async () => {
+    class Test extends Model {
+      @Field({ primaryKey: true })
+      id!: number
+    }
+
+    await init('test', 1)
+
+    // Simulate a page reload
+    disconnect()
+
+    const names: string[] = []
+    const migrations: MigrationList = {
+      2: async (migration) => {
+        names.push(...migration.tables)
+      },
+    }
+
+    await init('test', 2, migrations)
+
+    assert.sameMembers(names, ['Test'])
+  })
+  it('should be able to delete a table', async () => {
+    class Test extends Model {
+      @Field({ primaryKey: true })
+      id!: number
+    }
+
+    await init('test', 1)
+
+    await Test.create({ id: 1 })
+
+    // Simulate a page reload
+    disconnect()
+    _resetMetadata()
+
+    const migrations: MigrationList = {
+      2: async (migration) => {
+        migration.deleteTable('Test')
+      },
+    }
+
+    const initResp = await init('test', 2, migrations)
+    assert(initResp.session.objectStoreNames.length === 0)
   })
 })
