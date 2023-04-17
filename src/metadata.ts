@@ -1,7 +1,6 @@
 import type { FieldOptions, TableMetadata } from './types'
-import { db } from './connection'
 import type { Model } from './models'
-import { ConnectionError, ModelError, WormError } from './errors'
+import { ModelError, WormError } from './errors'
 
 /**
  * Global object storing the tables and their fields definitions.
@@ -100,9 +99,7 @@ export function getPrimaryKeys(tableName: string): string[] {
  * @throws {Error} Error if the database is not connected
  * @internal
  */
-export function createTables(tx: IDBTransaction): void {
-  if (!db.connected)
-    throw new ConnectionError('Database is not connected')
+export function createTables(session: IDBDatabase, tx: IDBTransaction): void {
   for (const tableName in TablesMetadata) {
     if (TablesMetadata[tableName].abstract)
       continue
@@ -111,7 +108,7 @@ export function createTables(tx: IDBTransaction): void {
     const primaryKeys = getPrimaryKeys(tableName)
 
     let store: IDBObjectStore
-    if (db.session.objectStoreNames.contains(tableName)) {
+    if (session.objectStoreNames.contains(tableName)) {
       store = tx.objectStore(tableName)
       const currentKeys = Array.isArray(store.keyPath) ? store.keyPath : [store.keyPath]
 
@@ -119,7 +116,7 @@ export function createTables(tx: IDBTransaction): void {
         throw new ModelError(`Table ${tableName} has a different primary key than the one in the database.`)
     }
     else {
-      store = db.session.createObjectStore(tableName, { keyPath: primaryKeys })
+      store = session.createObjectStore(tableName, { keyPath: primaryKeys })
     }
 
     const oldIndexes = new Set(store.indexNames)
