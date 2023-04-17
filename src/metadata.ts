@@ -1,7 +1,7 @@
 import type { FieldOptions, TableMetadata } from './types'
 import { db } from './connection'
 import type { Model } from './models'
-import { ConnectionError, WormError } from './errors'
+import { ConnectionError, ModelError, WormError } from './errors'
 
 /**
  * Global object storing the tables and their fields definitions.
@@ -100,7 +100,7 @@ export function getPrimaryKeys(tableName: string): string[] {
  * @throws {Error} Error if the database is not connected
  * @internal
  */
-export function createTables(): void {
+export function createTables(tx: IDBTransaction): void {
   if (!db.connected)
     throw new ConnectionError('Database is not connected')
   for (const tableName in TablesMetadata) {
@@ -109,7 +109,18 @@ export function createTables(): void {
 
     const tableFields = TablesMetadata[tableName].fields
     const primaryKeys = getPrimaryKeys(tableName)
-    const store = db.session.createObjectStore(tableName, { keyPath: primaryKeys })
+
+    let store: IDBObjectStore
+    if (db.session.objectStoreNames.contains(tableName)) {
+      store = tx.objectStore(tableName)
+      const currentKeys = Array.isArray(store.keyPath) ? store.keyPath : [store.keyPath]
+
+      if (!_compareArrays(currentKeys, primaryKeys))
+        throw new ModelError(`Table ${tableName} has a different primary key than the one in the database.`)
+    }
+    else {
+      store = db.session.createObjectStore(tableName, { keyPath: primaryKeys })
+    }
 
     const oldIndexes = new Set(store.indexNames)
     const newIndexes = new Set(Object.keys(tableFields).filter(fieldName => tableFields[fieldName].index))
@@ -143,4 +154,16 @@ export function createTables(): void {
  */
 export function _compareIndex(index: IDBIndex, field: FieldOptions<unknown>): boolean {
   return index.unique === field.unique
+}
+
+export function _compareArrays(a: unknown[], b: unknown[]): boolean {
+  if (a.length !== b.length)
+    return false
+
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i])
+      return false
+  }
+
+  return true
 }
