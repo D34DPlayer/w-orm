@@ -79,7 +79,7 @@ export async function init(dbName: string, version: number, migrations?: Migrati
 
       try {
         await ctx.runMigrations(ev.oldVersion, ev.newVersion)
-        createTables(request.transaction)
+        createTables(request.result, request.transaction)
       }
       catch (e) {
         request.transaction.abort()
