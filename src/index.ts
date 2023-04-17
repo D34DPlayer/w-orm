@@ -2,8 +2,6 @@
  * @module W-ORM
  */
 
-import './global'
-
 export * from './connection'
 export * from './fields'
 export * from './metadata'
