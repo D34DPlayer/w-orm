@@ -77,9 +77,16 @@ export async function init(dbName: string, version: number, migrations?: Migrati
 
       const ctx = new MigrationContext(request.result, request.transaction, migrations || {})
 
-      await ctx.runMigrations(ev.oldVersion, ev.newVersion)
+      try {
+        await ctx.runMigrations(ev.oldVersion, ev.newVersion)
+        createTables(request.transaction)
+      }
+      catch (e) {
+        request.transaction.abort()
+        reject(e)
+        return
+      }
 
-      createTables()
       request.transaction.oncomplete = () => {
         resolve({
           session: request.result,
