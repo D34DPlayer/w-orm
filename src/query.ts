@@ -373,4 +373,26 @@ export class Query<T extends Model> {
       return callback(instance, tx)
     }, txOrMode)
   }
+
+  /**
+   * Creates a copy of the current query.
+   * This allows a query to branch off into multiple queries.
+   * @returns - The cloned query
+   *
+   * @example
+   * ```ts
+   * // Regular pagination
+   * const userPage = User.orderBy('id').offset(10).limit(10)
+   *
+   * // Filtered pagination
+   * const johnPage = userPage.clone().filter({ name: 'John' })
+   * const janePage = userPage.clone().filter({ name: 'Jane' })
+   * ```
+   */
+  clone(): Query<T> {
+    const newQuery = new Query(this.TargetModel)
+    newQuery.filters = Object.create(this.filters) as Filter<T>
+
+    return newQuery
+  }
 }
