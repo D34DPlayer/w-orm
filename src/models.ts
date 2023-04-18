@@ -241,7 +241,25 @@ export abstract class Model implements Record<string, any> {
    * Deletes all the rows in the table.
    */
   public static clear(tx?: IDBTransaction): void {
-    const store = _objectStore(this.constructor.name, tx || 'readwrite')
+    const store = _objectStore(this.name, tx || 'readwrite')
     store.clear()
+  }
+
+  /**
+   * Get all the primary keys of the table.
+   * @returns - A list with all the primary keys
+   */
+  public static async keys(tx?: IDBTransaction): Promise<IDBValidKey[]> {
+    const store = _objectStore(this.name, tx)
+    const request = store.getAllKeys()
+
+    return new Promise((resolve, reject) => {
+      request.onerror = (_) => {
+        reject(request.error)
+      }
+      request.onsuccess = (_) => {
+        resolve(request.result)
+      }
+    })
   }
 }
