@@ -445,4 +445,34 @@ describe('Query builder', () => {
 
     assert(count === 2)
   })
+  it('should allow cloning a query', async () => {
+    class Test extends Model {
+      @Field({ primaryKey: true })
+      id!: number
+
+      @Field()
+      name!: string
+
+      @Field()
+      age!: number
+    }
+
+    await init('test', 1)
+
+    await Test.create({ id: 1, name: 'test1', age: 10 })
+    await Test.create({ id: 2, name: 'test1', age: 20 })
+    await Test.create({ id: 3, name: 'test2', age: 30 })
+
+    // Regular pagination
+    const userPage = Test.orderBy('id').offset(10).limit(10)
+
+    // Filtered pagination
+    const page1Query = userPage.clone().filter({ name: 'test1' })
+    const page2Query = userPage.clone().filter({ name: 'test2' })
+
+    const [page2, page1] = await Promise.all([page2Query.all(), page1Query.all()])
+
+    assert.lengthOf(page1, 2)
+    assert.lengthOf(page2, 1)
+  })
 })
