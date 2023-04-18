@@ -249,6 +249,22 @@ describe('Models', () => {
       const obtainedTest = await Test.get(createdTest.keys)
       assert.deepEqual(createdTest, obtainedTest)
     })
+    it('should be able to get all instance keys', async () => {
+      class Test extends Model {
+        @Field({ primaryKey: true })
+        id!: number
+      }
+
+      await init('test', 1)
+
+      await Test.create({ id: 1 })
+      await Test.create({ id: 2 })
+      await Test.create({ id: 3 })
+
+      const obtainedKeys = await Test.keys()
+
+      assert.sameDeepMembers(obtainedKeys, [[1], [2], [3]])
+    })
   })
   describe('delete', () => {
     it('should delete an instance', async () => {
@@ -265,6 +281,23 @@ describe('Models', () => {
 
       const obtainedTest = await Test.get(1)
       assert.isNull(obtainedTest)
+    })
+    it('should delete all instances', async () => {
+      class Test extends Model {
+        @Field({ primaryKey: true })
+        id!: number
+      }
+
+      await init('test', 1)
+
+      await Test.create({ id: 1 })
+      await Test.create({ id: 2 })
+      await Test.create({ id: 3 })
+
+      Test.clear()
+
+      const obtainedTests = await Test.all()
+      assert.lengthOf(obtainedTests, 0)
     })
   })
   describe('save', () => {
