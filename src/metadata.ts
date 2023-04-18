@@ -153,6 +153,13 @@ export function _compareIndex(index: IDBIndex, field: FieldOptions<unknown>): bo
   return index.unique === field.unique
 }
 
+/**
+ * Compares two arrays.
+ * @param a - The first array
+ * @param b - The second array
+ * @returns - True if the arrays are the same
+ * @internal
+ */
 export function _compareArrays(a: unknown[], b: unknown[]): boolean {
   if (a.length !== b.length)
     return false
