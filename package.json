@@ -16,6 +16,7 @@
   "bugs": {
     "url": "https://github.com/D34DPlayer/w-orm/issues"
   },
+  "sideEffects": false,
   "main": "dist/index.umd.js",
   "module": "dist/index.esm.js",
   "types": "dist/types/index.d.ts",
