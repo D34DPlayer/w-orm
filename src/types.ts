@@ -3,6 +3,7 @@
  */
 import type { Model } from './models'
 import type { MigrationContext } from './migration'
+import type { BetweenFilter } from './query'
 
 export interface DisconnectedDB {
   connected: false
@@ -51,8 +52,14 @@ export type ModelFieldKey<T extends Model> = string & keyof T
 export type Filter<T extends Model> = {
   [P in keyof T]?:
   T[P] |
+  BetweenFilter<T[P]> |
   ((instance: T[P]) => boolean) |
   undefined
+}
+
+export interface SimpleFilter<T extends Model> {
+  key: ModelFieldKey<T>
+  value: unknown
 }
 
 export type OrderBy<T extends Model> = (ModelFieldKey<T>) | `-${ModelFieldKey<T>}`

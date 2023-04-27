@@ -1,7 +1,41 @@
-import type { CursorCallback, Filter, ForEachCallback, ModelFieldKey, OrderBy, TransactionOrMode } from './types'
+import type { CursorCallback, Filter, ForEachCallback, ModelFieldKey, OrderBy, SimpleFilter, TransactionOrMode } from './types'
 import type { Model } from './models'
 import { _objectStore } from './transaction'
 import { WormError } from './errors'
+
+export class BetweenFilter<T> {
+  static minKey = -Infinity
+  static maxKey = [[]]
+
+  constructor(public lower: T | null, public upper: T | null, public lowerOpen = false, public upperOpen = false) {}
+
+  public keyRange(): IDBKeyRange {
+    const lower: unknown = this.lower === null ? BetweenFilter.minKey : this.lower
+    const upper: unknown = this.upper === null ? BetweenFilter.maxKey : this.upper
+
+    return IDBKeyRange.bound(lower, upper, this.lowerOpen, this.upperOpen)
+  }
+
+  public fits(value: any): boolean {
+    let lowerCmp = false
+    if (this.lower === null || this.lower === undefined)
+      lowerCmp = true
+    else if (this.lowerOpen)
+      lowerCmp = value > this.lower
+    else
+      lowerCmp = value >= this.lower
+
+    let upperCmp = false
+    if (this.upper === null || this.upper === undefined)
+      upperCmp = true
+    else if (this.upperOpen)
+      upperCmp = value < this.upper
+    else
+      upperCmp = value <= this.upper
+
+    return lowerCmp && upperCmp
+  }
+}
 
 export class Query<T extends Model> {
   /** The filters to apply to the query */
@@ -151,6 +185,11 @@ export class Query<T extends Model> {
           return false
         continue
       }
+      else if (value instanceof BetweenFilter) {
+        // If the value is a BetweenFilter, we check if the instance's value is between the filter's values
+        if (!value.fits(instance[key as keyof T]))
+          return false
+      }
       else {
         // If the value is not a function, we compare it with the instance's value
         if (instance[key as keyof T] !== value as T[keyof T])
@@ -161,7 +200,23 @@ export class Query<T extends Model> {
   }
 
   /**
+   * Get the appropriate key range for the given simple filter.
+   * If the filter is a BetweenFilter, it will return the key range of the filter.
+   * Otherwise, it will return a key range with just the value.
+   * @param value - The value of the simple filter
+   * @returns - The key range for the simple filter
+  */
+  private _getKeyRange(value: unknown): IDBKeyRange {
+    if (value instanceof BetweenFilter)
+      return value.keyRange()
+
+    return IDBKeyRange.only(value)
+  }
+
+  /**
    * Utility function to get the cursor of the query.
+   * If the query has an order, it will use the index of the order.
+   * Otherwise, if the query has a simple filter, it will use the index of the filter + add a query.
    * @returns
    */
   private _getCursor(txOrMode: TransactionOrMode = 'readonly'): IDBRequest<IDBCursorWithValue | null> {
@@ -172,8 +227,32 @@ export class Query<T extends Model> {
       return index.openCursor(undefined, this._reverse ? 'prev' : 'next')
     }
     else {
+      const simpleFilter = this._findSimpleFilter()
+
+      if (simpleFilter) {
+        const index = store.index(simpleFilter.key)
+
+        return index.openCursor(this._getKeyRange(simpleFilter.value), this._reverse ? 'prev' : 'next')
+      }
+
       return store.openCursor(undefined, this._reverse ? 'prev' : 'next')
     }
+  }
+
+  /**
+   * Look for a simple filter in the query's filters.
+   * @returns - The first simple filter found, or null if none was found
+   */
+  private _findSimpleFilter(): SimpleFilter<T> | null {
+    for (const [key, value] of Object.entries(this.filters)) {
+      if (typeof value !== 'function') {
+        return {
+          key,
+          value: value as T[keyof T],
+        }
+      }
+    }
+    return null
   }
 
   /**
