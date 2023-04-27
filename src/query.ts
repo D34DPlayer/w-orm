@@ -4,19 +4,59 @@ import { _objectStore } from './transaction'
 import { WormError } from './errors'
 
 export class BetweenFilter<T> {
+  /** The minimum key for IDB */
   static minKey = -Infinity
+  /** The "maximum" key for IDB */
   static maxKey = [[]]
 
+  /**
+   * A filter that checks if a value is between two values.
+   * @param lower - The lower bound of the filter
+   * @param upper - The upper bound of the filter
+   * @param lowerOpen - Whether the lower bound is open
+   * @param upperOpen - Whether the upper bound is open
+   * @typeParam T - The type of the value to filter
+   * @example
+   * ```ts
+   * // Get all users with an age between 20 and 30
+   * const query = User.filter({ age: new BetweenFilter(20, 30) })
+   * // Get all users with an age between 20 and 30, excluding 20 and 30
+   * const query = User.filter({ age: new BetweenFilter(20, 30, true, true) })
+   * ```
+   */
   constructor(public lower: T | null, public upper: T | null, public lowerOpen = false, public upperOpen = false) {}
 
+  /**
+   * Recursively replaces the null values with the default value.
+   * @param val - The value to replace
+   * @param defaultVal - The default value to replace with
+   * @returns - The value with the default values replaced
+   */
+  private withDefault(val: unknown, defaultVal: unknown): unknown {
+    if (val === undefined || val === null)
+      return defaultVal
+    if (Array.isArray(val))
+      return val.map(v => this.withDefault(v, defaultVal))
+    return val
+  }
+
+  /**
+   * Returns the IDBKeyRange for this filter.
+   * @returns - The IDBKeyRange for this filter
+   */
   public keyRange(): IDBKeyRange {
-    const lower: unknown = this.lower === null ? BetweenFilter.minKey : this.lower
-    const upper: unknown = this.upper === null ? BetweenFilter.maxKey : this.upper
+    const lower: unknown = this.withDefault(this.lower, BetweenFilter.minKey)
+    const upper: unknown = this.withDefault(this.upper, BetweenFilter.maxKey)
 
     return IDBKeyRange.bound(lower, upper, this.lowerOpen, this.upperOpen)
   }
 
-  public fits(value: any): boolean {
+  /**
+   * Checks if a value fits the filter.
+   * @param value - The value to check
+   * @returns - Whether the value fits the filter
+   */
+  public fits(value: T): boolean {
     let lowerCmp = false
     if (this.lower === null || this.lower === undefined)
       lowerCmp = true
