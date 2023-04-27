@@ -117,6 +117,21 @@ describe('Fields', () => {
       assert(store.indexNames.contains('id'))
       assert(!store.indexNames.contains('test'))
     })
+    it('should be able to infer the default value', async () => {
+      class Test extends Model {
+        @Field({ primaryKey: true })
+        id!: number
+
+        @Field()
+        test: string = 'test'
+      }
+
+      await init('test', 1)
+
+      const test = await Test.create({ id: 1 })
+
+      assert.equal(test.test, 'test')
+    })
   })
   describe('Define table helper', () => {
     it('should be able to set a field as primary key', async () => {
