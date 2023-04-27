@@ -3,7 +3,7 @@ import { assert } from 'chai'
 import { init } from '../src/connection'
 import { Model } from '../src/models'
 import { Field } from '../src/fields'
-import { Query } from '../src/query'
+import { BetweenFilter, Query } from '../src/query'
 
 describe('Query builder', () => {
   it('should return all when no filters are applied', async () => {
@@ -474,5 +474,67 @@ describe('Query builder', () => {
 
     assert.lengthOf(page1, 2)
     assert.lengthOf(page2, 1)
+  })
+  it('should allow range filters', async () => {
+    class Test extends Model {
+      @Field({ primaryKey: true })
+      id!: number
+
+      @Field()
+      name!: string
+    }
+
+    await init('test', 1)
+
+    const test1 = await Test.create({ id: 1, name: 'test1' })
+    const test2 = await Test.create({ id: 2, name: 'test2' })
+    const test3 = await Test.create({ id: 3, name: 'test3' })
+    const test4 = await Test.create({ id: 4, name: 'test4' })
+
+    let obtainedTests = await Test.filter({ id: new BetweenFilter(1, 2) }).all()
+    assert.sameDeepMembers(obtainedTests, [test1, test2])
+
+    obtainedTests = await Test.filter({ id: new BetweenFilter(2, 3, true, false) }).all()
+    assert.sameDeepMembers(obtainedTests, [test3])
+
+    obtainedTests = await Test.filter({ id: new BetweenFilter(3, 4, true, true) }).all()
+    assert.lengthOf(obtainedTests, 0)
+
+    obtainedTests = await Test.filter({ id: new BetweenFilter(1, null, true, false) }).all()
+    assert.sameDeepMembers(obtainedTests, [test2, test3, test4])
+
+    obtainedTests = await Test.filter({ id: new BetweenFilter(null, 3, false, true) }).all()
+    assert.sameDeepMembers(obtainedTests, [test1, test2])
+  })
+  it('should allow range filters without indexing', async () => {
+    class Test extends Model {
+      @Field({ primaryKey: true })
+      id!: number
+
+      @Field()
+      name!: string
+    }
+
+    await init('test', 1)
+
+    const test1 = await Test.create({ id: 1, name: 'test1' })
+    const test2 = await Test.create({ id: 2, name: 'test2' })
+    const test3 = await Test.create({ id: 3, name: 'test3' })
+    const test4 = await Test.create({ id: 4, name: 'test4' })
+
+    let obtainedTests = await Test.filter({ id: new BetweenFilter(1, 2) }).orderBy('name').all()
+    assert.sameDeepMembers(obtainedTests, [test1, test2])
+
+    obtainedTests = await Test.filter({ id: new BetweenFilter(2, 3, true, false) }).orderBy('name').all()
+    assert.sameDeepMembers(obtainedTests, [test3])
+
+    obtainedTests = await Test.filter({ id: new BetweenFilter(3, 4, true, true) }).orderBy('name').all()
+    assert.lengthOf(obtainedTests, 0)
+
+    obtainedTests = await Test.filter({ id: new BetweenFilter(1, null, true, false) }).orderBy('name').all()
+    assert.sameDeepMembers(obtainedTests, [test2, test3, test4])
+
+    obtainedTests = await Test.filter({ id: new BetweenFilter(null, 3, false, true) }).orderBy('name').all()
+    assert.sameDeepMembers(obtainedTests, [test1, test2])
   })
 })
