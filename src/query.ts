@@ -82,6 +82,10 @@ export class Query<T extends Model> {
   private filters = {} as Filter<T>
   /** The field to order the query by */
   private _orderBy?: ModelFieldKey<T>
+  /** Index to use */
+  private _index?: string
+  /** Index query */
+  private _indexQuery?: BetweenFilter<unknown>
   /** Whether to reverse the order of the query */
   private _reverse = false
   /** Maximum amount of items to return */
@@ -106,6 +110,9 @@ export class Query<T extends Model> {
   /**
    * Update the filters of the query.
    * This will not reset the filters, but will merge the new filters with the old ones.
+   *
+   * For ranges, it is recommended to use a {@link BetweenFilter} for performance reasons.
+   *
    * @param filters - The new filters to apply to the query
    * @returns - The query itself, to allow chaining
    *
@@ -138,6 +145,10 @@ export class Query<T extends Model> {
 
   /**
    * Update the field used to order the query.
+   *
+   * Given that this uses the index under the hood, you have to choose between using this or {@link withIndex};
+   * up to you to benchmark which one is faster.
+   *
    * @param field - The field to order the query by, prepend with `-` to reverse the order
    * @returns - The query itself, to allow chaining
    *
@@ -149,6 +160,9 @@ export class Query<T extends Model> {
    * const query = User.orderBy('-name')
    */
   public orderBy(field: OrderBy<T>): Query<T> {
+    if (this._index)
+      throw new WormError('Cannot order by field when using an index: order it manually, or use `resetIndex` instead')
+
     if (field.startsWith('-')) {
       this._reverse = true
       this._orderBy = field.slice(1) as ModelFieldKey<T>
@@ -212,6 +226,30 @@ export class Query<T extends Model> {
   }
 
   /**
+   * Define the index to use for the query, with an optional filter query.
+   * Given that the orderBy also uses the index, only one can be used at once,
+   * up to you to benchmark which one is faster.
+   * @param index - The index to use
+   * @param query - The query to use on the index
+   * @returns
+   */
+  public withIndex(index: ModelFieldKey<T> | string, query?: BetweenFilter<unknown>): Query<T> {
+    if (this._orderBy)
+      throw new WormError('Cannot order by field when using an index: order it manually or don\'t use an index')
+
+    this._index = index
+    if (query)
+      this._indexQuery = query
+    return this
+  }
+
+  public resetIndex(): Query<T> {
+    this._index = undefined
+    this._indexQuery = undefined
+    return this
+  }
+
+  /**
    * Checks if the given instance fits the filters of the query.
    * @param instance - The instance to check
    * @returns - Whether the instance fits the filters
@@ -261,22 +299,28 @@ export class Query<T extends Model> {
    */
   private _getCursor(txOrMode: TransactionOrMode = 'readonly'): IDBRequest<IDBCursorWithValue | null> {
     const store = _objectStore(this.TargetModel.name, txOrMode)
+
+    if (this._index) {
+      const index = store.index(this._index)
+
+      return index.openCursor(this._indexQuery?.keyRange(), this._reverse ? 'prev' : 'next')
+    }
+
     if (this._orderBy) {
       const index = store.index(this._orderBy)
 
       return index.openCursor(undefined, this._reverse ? 'prev' : 'next')
     }
-    else {
-      const simpleFilter = this._findSimpleFilter()
 
-      if (simpleFilter) {
-        const index = store.index(simpleFilter.key)
+    const simpleFilter = this._findSimpleFilter()
 
-        return index.openCursor(this._getKeyRange(simpleFilter.value), this._reverse ? 'prev' : 'next')
-      }
+    if (simpleFilter) {
+      const index = store.index(simpleFilter.key)
 
-      return store.openCursor(undefined, this._reverse ? 'prev' : 'next')
+      return index.openCursor(this._getKeyRange(simpleFilter.value), this._reverse ? 'prev' : 'next')
     }
+
+    return store.openCursor(undefined, this._reverse ? 'prev' : 'next')
   }
 
   /**

@@ -1,6 +1,7 @@
-import type { Filter, ForEachCallback, OrderBy } from './types'
+import type { Filter, ForEachCallback, ModelFieldKey, OrderBy } from './types'
 import { TablesMetadata, getPrimaryKeys } from './metadata'
 import { _objectStore } from './transaction'
+import type { BetweenFilter } from './query'
 import { Query } from './query'
 import { ModelError } from './errors'
 
@@ -184,6 +185,18 @@ export abstract class Model implements Record<string, any> {
    */
   public static orderBy<T extends Model>(this: { new(): T }, orderBy: OrderBy<T>): Query<T> {
     return (new Query(this)).orderBy(orderBy)
+  }
+
+  /**
+   * Start a query for this model with a specific index.
+   * @see {@link Query.withIndex} for more information
+   *
+   * @param index - The index to use
+   * @param query - A query to filter the index
+   * @returns - The new query
+   */
+  public static withIndex<T extends Model>(this: { new(): T }, index: ModelFieldKey<T>, query: BetweenFilter<unknown>): Query<T> {
+    return (new Query(this)).withIndex(index, query)
   }
 
   /**
