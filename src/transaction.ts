@@ -50,8 +50,9 @@ export function _objectStore(storeName: string, txOrMode?: TransactionOrMode): I
  *
  * @param mode - The transaction mode
  * @param transactionCallback - The callback to execute in the transaction
+ * @returns - The result of the transactionCallback
  */
-export async function Transaction(mode: IDBTransactionMode, transactionCallback: TransactionCallback): Promise<unknown> {
+export async function Transaction<T>(mode: IDBTransactionMode, transactionCallback: TransactionCallback<T>): Promise<T> {
   if (!db.connected)
     throw new ConnectionError('Database is not connected')
   const stores = Array.from(db.session.objectStoreNames)
@@ -62,7 +63,10 @@ export async function Transaction(mode: IDBTransactionMode, transactionCallback:
     transaction.onerror = () => reject(transaction.error)
   })
   const callbackPromise = transactionCallback(transaction)
-    .then(() => transaction.commit())
+    .then((x) => {
+      transaction.commit()
+      return x
+    })
     .catch((error: Error) => {
       transaction.abort()
       throw error
