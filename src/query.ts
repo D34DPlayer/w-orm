@@ -2,6 +2,7 @@ import type { CursorCallback, Filter, ForEachCallback, ModelFieldKey, OrderBy, S
 import type { Model } from './models'
 import { _objectStore } from './transaction'
 import { WormError } from './errors'
+import { _getIndexableFields } from './metadata'
 
 export class BetweenFilter<T> {
   /** The minimum key for IDB */
@@ -328,8 +329,9 @@ export class Query<T extends Model> {
    * @returns - The first simple filter found, or null if none was found
    */
   private _findSimpleFilter(): SimpleFilter<T> | null {
+    const indexableFields = _getIndexableFields(this.TargetModel.name)
     for (const [key, value] of Object.entries(this.filters)) {
-      if (typeof value !== 'function') {
+      if (typeof value !== 'function' && indexableFields.includes(key)) {
         return {
           key,
           value: value as T[keyof T],
