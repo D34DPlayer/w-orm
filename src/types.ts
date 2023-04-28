@@ -64,7 +64,7 @@ export interface SimpleFilter<T extends Model> {
 
 export type OrderBy<T extends Model> = (ModelFieldKey<T>) | `-${ModelFieldKey<T>}`
 
-export type TransactionCallback = (tx: IDBTransaction) => Promise<unknown>
+export type TransactionCallback<T> = (tx: IDBTransaction) => Promise<T>
 
 export type TransactionOrMode = IDBTransaction | IDBTransactionMode
 
