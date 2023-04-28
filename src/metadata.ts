@@ -171,3 +171,22 @@ export function _compareArrays(a: unknown[], b: unknown[]): boolean {
 
   return true
 }
+
+/**
+ * Returns the fields that are indexable for a table.
+ * @param tableName - The table's name
+ * @returns - The indexable fields
+ */
+export function _getIndexableFields(tableName: string): string[] {
+  const tableFields = TablesMetadata[tableName]?.fields
+  if (!tableFields)
+    return []
+
+  const indexableFields = []
+  for (const fieldName in tableFields) {
+    const field = tableFields[fieldName]
+    if (field.index)
+      indexableFields.push(fieldName)
+  }
+  return indexableFields
+}
