@@ -51,7 +51,7 @@ export function _objectStore(storeName: string, txOrMode?: TransactionOrMode): I
  * @param mode - The transaction mode
  * @param transactionCallback - The callback to execute in the transaction
  */
-export async function Transaction(mode: IDBTransactionMode, transactionCallback: TransactionCallback): Promise<void> {
+export async function Transaction(mode: IDBTransactionMode, transactionCallback: TransactionCallback): Promise<unknown> {
   if (!db.connected)
     throw new ConnectionError('Database is not connected')
   const stores = Array.from(db.session.objectStoreNames)
@@ -68,5 +68,6 @@ export async function Transaction(mode: IDBTransactionMode, transactionCallback:
       throw error
     })
 
-  await Promise.all([callbackPromise, transactionPromise])
+  const [res, _] = await Promise.all([callbackPromise, transactionPromise])
+  return res
 }
