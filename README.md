@@ -147,8 +147,10 @@ Sometimes DB operations are meant to be executed as a "bundle", so that they eit
 
 Transactions allow us to implement this, with automatic rollbacks on error. And even if you don't need this, there are performance benefits to using transactions.
 
+The tables that a transaction will interact with need to be explicitly defined, as write transactions will lock those until the transaction is over.
+
 ```ts
-await Transaction('readwrite', async (tx) => {
+await Transaction('readwrite', [User], async (tx) => {
   const newUser = await User.create({ name: 'John Doe' }, tx)
   const getUser = await User.get(newUser.id, tx)
 
