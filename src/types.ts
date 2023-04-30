@@ -46,8 +46,11 @@ export interface TableFieldsMetadata {
   [fieldName: string]: FieldOptions<unknown>
 }
 
+/** The things defined by Model itself, can't be inferred bcs of Record implementation */
+export type ModelExclusiveFields = 'keys' | 'delete' | 'save' | 'update'
 /** The user defined fields as a string list */
-export type ModelFieldKey<T extends Model> = string & keyof T
+export type ModelFields<T extends Model> = Omit<T, ModelExclusiveFields>
+export type ModelFieldKey<T extends Model> = string & keyof ModelFields<T>
 
 export type Filter<T extends Model> = {
   [P in keyof T]?:
