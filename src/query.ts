@@ -1,4 +1,4 @@
-import type { CursorCallback, Filter, ForEachCallback, ModelFieldKey, OrderBy, SimpleFilter, TransactionOrMode } from './types'
+import type { CursorCallback, Filter, ForEachCallback, ModelFieldKey, ModelFields, OrderBy, SimpleFilter, TransactionOrMode } from './types'
 import type { Model } from './models'
 import { _objectStore } from './transaction'
 import { WormError } from './errors'
@@ -333,8 +333,8 @@ export class Query<T extends Model> {
     for (const [key, value] of Object.entries(this.filters)) {
       if (typeof value !== 'function' && indexableFields.includes(key)) {
         return {
-          key,
-          value: value as T[keyof T],
+          key: key as ModelFieldKey<T>,
+          value: value as ModelFields<T>[ModelFieldKey<T>],
         }
       }
     }
