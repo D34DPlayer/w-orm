@@ -17,7 +17,7 @@ describe('Transactions', () => {
 
     await init('test', 1)
 
-    await Transaction('readwrite', async (tx) => {
+    await Transaction('readwrite', [Test], async (tx) => {
       const test1 = await Test.create({ id: 1, balance: 100 }, tx)
       const test2 = await Test.create({ id: 2, balance: 50 }, tx)
       const test3 = await Test.create({ id: 3, balance: 300 }, tx)
@@ -37,7 +37,7 @@ describe('Transactions', () => {
 
     await init('test', 1)
 
-    await Transaction('readwrite', async (tx) => {
+    await Transaction('readwrite', [Test], async (tx) => {
       const test1 = await Test.create({ id: 1, balance: 100 }, tx)
     })
 
@@ -55,7 +55,7 @@ describe('Transactions', () => {
 
     await init('test', 1)
 
-    await Transaction('readwrite', async (tx) => {
+    await Transaction('readwrite', [Test], async (tx) => {
       await Test.create({ id: 1, balance: 100 }, tx)
       const obtainedTests = await Test.all(tx)
       assert.lengthOf(obtainedTests, 1)
@@ -79,7 +79,7 @@ describe('Transactions', () => {
 
     await init('test', 1)
 
-    await Transaction('readwrite', async (tx) => {
+    await Transaction('readwrite', [Test], async (tx) => {
       await Test.create({ id: 1 }, tx)
       await wait(100)
     }).then(

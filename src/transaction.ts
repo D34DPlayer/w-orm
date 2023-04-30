@@ -1,6 +1,7 @@
-import type { TransactionCallback, TransactionOrMode } from './types'
+import type { Constructor, TransactionCallback, TransactionOrMode } from './types'
 import { db } from './connection'
 import { ConnectionError, WormError } from './errors'
+import type { Model } from './models'
 
 export function _objectStore(storeName: string, tx?: IDBTransaction): IDBObjectStore
 export function _objectStore(storeName: string, mode?: IDBTransactionMode): IDBObjectStore
@@ -26,7 +27,7 @@ export function _objectStore(storeName: string, txOrMode?: TransactionOrMode): I
 }
 
 /**
- * Starts a db transaction.
+ * Starts a db transaction. The tables concerned need to be passed as an array.
  * Depending on the result of the transactionCallback, the transaction will be committed or aborted.
  *
  * Because of a limitation in the IndexedDB API, the transaction will be automatically committed
@@ -38,7 +39,7 @@ export function _objectStore(storeName: string, txOrMode?: TransactionOrMode): I
  *
  * @example
  * ```ts
- * await Transaction('readwrite', async (tx) => {
+ * await Transaction('readwrite', [User], async (tx) => {
  *  const newUser = await User.create({ name: 'John Doe' }, tx)
  *  const getUser = await User.get(newUser.id, tx)
  *
@@ -49,13 +50,14 @@ export function _objectStore(storeName: string, txOrMode?: TransactionOrMode): I
  * ```
  *
  * @param mode - The transaction mode
+ * @param models - The models to use in the transaction
  * @param transactionCallback - The callback to execute in the transaction
  * @returns - The result of the transactionCallback
  */
-export async function Transaction<T>(mode: IDBTransactionMode, transactionCallback: TransactionCallback<T>): Promise<T> {
+export async function Transaction<T>(mode: IDBTransactionMode, models: Constructor<Model>[], transactionCallback: TransactionCallback<T>): Promise<T> {
   if (!db.connected)
     throw new ConnectionError('Database is not connected')
-  const stores = Array.from(db.session.objectStoreNames)
+  const stores = models.map(model => model.name)
 
   const transaction = db.session.transaction(stores, mode)
   const transactionPromise = new Promise<void>((resolve, reject) => {

@@ -1,5 +1,7 @@
 import { assert } from 'chai'
 import { Transaction, _objectStore } from '../src/transaction'
+import { Model } from '../src/models'
+import { Field } from '../src/fields'
 
 describe('Connection Errors', () => {
   it('should fail at _objectStore', async () => {
@@ -8,7 +10,12 @@ describe('Connection Errors', () => {
     }, /not connected/)
   })
   it('should fail at Transaction', (done) => {
-    Transaction('readwrite', async () => {
+    class Test extends Model {
+      @Field({ primaryKey: true })
+      id!: number
+    }
+
+    Transaction('readwrite', [Test], async () => {
     // ...
     }).then(() => {
       done(new Error('Should have failed'))
