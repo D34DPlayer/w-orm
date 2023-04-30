@@ -1,6 +1,6 @@
 import type { TransactionCallback, TransactionOrMode } from './types'
 import { db } from './connection'
-import { ConnectionError } from './errors'
+import { ConnectionError, WormError } from './errors'
 
 export function _objectStore(storeName: string, tx?: IDBTransaction): IDBObjectStore
 export function _objectStore(storeName: string, mode?: IDBTransactionMode): IDBObjectStore
@@ -62,16 +62,28 @@ export async function Transaction<T>(mode: IDBTransactionMode, transactionCallba
     transaction.oncomplete = () => resolve()
     transaction.onerror = () => reject(transaction.error)
   })
+
+  let callbackDone = false
   const callbackPromise = transactionCallback(transaction)
     .then((x) => {
+      callbackDone = true
       transaction.commit()
       return x
     })
     .catch((error: Error) => {
+      callbackDone = true
       transaction.abort()
       throw error
     })
 
-  const [res, _] = await Promise.all([callbackPromise, transactionPromise])
-  return res
+  const res = await Promise.race([callbackPromise, transactionPromise])
+
+  if (!callbackDone) {
+    // If the callback is still pending, it means that it's waiting for a non transactional operation.
+    // We can't prevent it to continue using the transaction, so we have to throw an error.
+    throw new WormError('The transaction committed, but the callback is still pending. Make sure to not await any non transactional operation in it.')
+  }
+
+  // The callback is done, so it has to be its result
+  return res as T
 }
