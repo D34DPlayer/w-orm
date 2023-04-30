@@ -67,4 +67,23 @@ describe('Transactions', () => {
     const obtainedTests = await Test.all()
     assert.lengthOf(obtainedTests, 0)
   })
+  it('should throw an error if the transaction commits early', async () => {
+    function wait(ms: number) {
+      return new Promise(resolve => setTimeout(resolve, ms))
+    }
+
+    class Test extends Model {
+      @Field({ primaryKey: true })
+      id!: number
+    }
+
+    await init('test', 1)
+
+    await Transaction('readwrite', async (tx) => {
+      await Test.create({ id: 1 }, tx)
+      await wait(100)
+    }).then(
+      () => assert.fail('Should have thrown an error'),
+    ).catch((err: Error) => assert.match(err.message, /callback is still pending/))
+  })
 })
