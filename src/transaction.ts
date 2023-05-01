@@ -2,6 +2,7 @@ import type { Constructor, TransactionCallback, TransactionOrMode } from './type
 import { db } from './connection'
 import { ConnectionError, WormError } from './errors'
 import type { Model } from './models'
+import { TablesMetadata } from './metadata'
 
 export function _objectStore(storeName: string, tx?: IDBTransaction): IDBObjectStore
 export function _objectStore(storeName: string, mode?: IDBTransactionMode): IDBObjectStore
@@ -15,6 +16,9 @@ export function _objectStore(storeName: string, txOrMode?: TransactionOrMode): I
  * @internal
  */
 export function _objectStore(storeName: string, txOrMode?: TransactionOrMode): IDBObjectStore {
+  if (storeName in TablesMetadata)
+    storeName = TablesMetadata[storeName].tableName
+
   if (!db.connected)
     throw new ConnectionError('Database is not connected')
   if (txOrMode instanceof IDBTransaction) {
