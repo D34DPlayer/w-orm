@@ -1,5 +1,5 @@
-import type { Constructor, FieldOptions, TableDefinition } from './types'
-import { _addFieldToMetadata, _handleTableData } from './metadata'
+import type { Constructor, FieldOptions, TableDefinition, TableOptions } from './types'
+import { _addFieldToMetadata, _handleTableData, _overrideTableData } from './metadata'
 import { ModelError, WormError } from './errors'
 import type { Model } from './models'
 
@@ -93,9 +93,17 @@ export function Field<T>(options: Partial<FieldOptions<T>> = {}): PropertyDecora
  * })
  * ```
  */
-export function defineModel<T extends Model>(modelClass: Constructor<T>, definition: TableDefinition) {
+export function defineModel<T extends Model>(modelClass: Constructor<T>, definition: TableDefinition, options: TableOptions = {}) {
   for (const field in definition) {
     const fieldOpts = definition[field]
     Field(fieldOpts)(modelClass.prototype as T, field)
+  }
+
+  _overrideTableData(modelClass.prototype, options)
+}
+
+export function Table(options: TableOptions = {}): ClassDecorator {
+  return function (constructor) {
+    _overrideTableData(constructor.prototype, options)
   }
 }
