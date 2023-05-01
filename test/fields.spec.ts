@@ -2,7 +2,7 @@ import { assert } from 'chai'
 
 import { db, init } from '../src/connection'
 import { Model } from '../src/models'
-import { Field, defineModel } from '../src/fields'
+import { Field, Table, defineModel } from '../src/fields'
 import { _objectStore } from '../src/transaction'
 
 describe('Fields', () => {
@@ -236,6 +236,103 @@ describe('Fields', () => {
 
       assert(store.indexNames.contains('id'))
       assert(!store.indexNames.contains('test'))
+    })
+  })
+  describe('Table decorator', () => {
+    it('allows overriding the table name', async () => {
+      @Table({ name: 'tableName' })
+      class Test extends Model {
+        @Field({ primaryKey: true })
+        id!: number
+      }
+
+      await init('test', 1)
+
+      const store = _objectStore('tableName')
+      assert.equal(store.name, 'tableName')
+    })
+    it('allows defining abstract models', async () => {
+      // This one would be abstract by default
+      @Table({ abstract: false })
+      class BaseModel extends Model {
+        @Field({ primaryKey: true })
+        id!: number
+      }
+
+      @Table({ abstract: true })
+      class Test extends BaseModel {
+        @Field()
+        test!: string
+      }
+
+      await init('test', 1)
+
+      const store = _objectStore('BaseModel')
+      assert.equal(store.name, 'BaseModel')
+
+      assert.throws(() => _objectStore('Test'), /No objectStore named Test/)
+    })
+    it('allows defining a compound index', async () => {
+      @Table({
+        indexes: {
+          test: 'id+name',
+        },
+      })
+      class Test extends Model {
+        @Field({ primaryKey: true })
+        id!: number
+
+        @Field()
+        name!: string
+      }
+
+      await init('test', 1)
+
+      const store = _objectStore('Test')
+      const index = store.index('test')
+      assert.sameOrderedMembers(Array.from(index.keyPath), ['id', 'name'])
+    })
+    it('allows defining a multiEntry index', async () => {
+      @Table({
+        indexes: {
+          test: '*tags',
+        },
+      })
+      class Test extends Model {
+        @Field({ primaryKey: true })
+        id!: number
+
+        @Field({ index: false })
+        tags!: string
+      }
+
+      await init('test', 1)
+
+      const store = _objectStore('Test')
+      const index = store.index('test')
+      assert.isTrue(index.multiEntry)
+      assert.equal(index.keyPath, 'tags')
+    })
+    it('allows defining a unique compound index', async () => {
+      @Table({
+        indexes: {
+          test: '&id+name',
+        },
+      })
+      class Test extends Model {
+        @Field({ primaryKey: true })
+        id!: number
+
+        @Field()
+        name!: string
+      }
+
+      await init('test', 1)
+
+      const store = _objectStore('Test')
+      const index = store.index('test')
+      assert.isTrue(index.unique)
+      assert.sameOrderedMembers(Array.from(index.keyPath), ['id', 'name'])
     })
   })
 })
