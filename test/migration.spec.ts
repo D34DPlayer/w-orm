@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import { db, disconnect, init } from '../src/connection'
 import { Field, defineModel } from '../src/fields'
-import { Model } from '../src/models'
+import { LenientModel, Model } from '../src/models'
 import { _resetMetadata } from '../src/metadata'
 import type { MigrationList } from '../src/types'
 import { _objectStore } from '../src/transaction'
@@ -112,7 +112,7 @@ describe('Migration system', () => {
   })
   it('should fail when the primary key has been changed', async () => {
     // First version
-    class Test1 extends Model {
+    class Test1 extends LenientModel {
       id!: number
     }
     Object.defineProperty(Test1, 'name', { value: 'Test' })
