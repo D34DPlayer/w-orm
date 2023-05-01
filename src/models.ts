@@ -1,4 +1,4 @@
-import type { Filter, ForEachCallback, ModelFieldKey, OrderBy } from './types'
+import type { Filter, ForEachCallback, OrderBy } from './types'
 import { TablesMetadata, getPrimaryKeys } from './metadata'
 import { _objectStore } from './transaction'
 import type { BetweenFilter } from './query'
@@ -46,9 +46,6 @@ import { ModelError } from './errors'
  * ```
  */
 export abstract class Model implements Record<string, any> {
-  /** Allows setting extra elements in a model, since this is allowed by IDB */
-  [x: string]: any
-
   /**
    * Create a new model instance.
    * @param values - The values to initialize the model with
@@ -195,7 +192,7 @@ export abstract class Model implements Record<string, any> {
    * @param query - A query to filter the index
    * @returns - The new query
    */
-  public static withIndex<T extends Model>(this: { new(): T }, index: ModelFieldKey<T>, query: BetweenFilter<unknown>): Query<T> {
+  public static withIndex<T extends Model>(this: { new(): T }, index: string, query: BetweenFilter<unknown>): Query<T> {
     return (new Query(this)).withIndex(index, query)
   }
 
@@ -275,4 +272,9 @@ export abstract class Model implements Record<string, any> {
       }
     })
   }
+}
+
+export abstract class LenientModel extends Model {
+  /** Allows setting extra elements in a model, since this is allowed by IDB */
+  [key: string]: unknown
 }
