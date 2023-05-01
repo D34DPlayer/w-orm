@@ -2,7 +2,7 @@ import { assert } from 'chai'
 
 import { init } from '../src/connection'
 import { Model } from '../src/models'
-import { Field } from '../src/fields'
+import { Field, Table } from '../src/fields'
 import { BetweenFilter, Query } from '../src/query'
 import { WormError } from '../src/errors'
 
@@ -603,6 +603,79 @@ describe('Query builder', () => {
       }, WormError)
 
       await Test.withIndex('id', new BetweenFilter(1, 2)).resetIndex().orderBy('name').all()
+    })
+    it('should work with compound indexes', async () => {
+      @Table({
+        indexes: {
+          nameAge: 'name+age',
+        },
+      })
+      class Test extends Model {
+        @Field({ primaryKey: true })
+        id!: number
+
+        @Field()
+        name!: string
+
+        @Field()
+        age!: number
+      }
+
+      await init('test', 1)
+
+      const test1 = await Test.create({ id: 1, name: 'carlos', age: 10 })
+      const test2 = await Test.create({ id: 2, name: 'carlos', age: 2 })
+      const test3 = await Test.create({ id: 3, name: 'test3', age: 32 })
+      const test4 = await Test.create({ id: 4, name: 'test4', age: 33 })
+      const test5 = await Test.create({ id: 5, name: 'carlos', age: 30 })
+
+      // All those with name = 'carlos' and order by age
+      let obtainedTests = await Test.withIndex(
+        'nameAge',
+        new BetweenFilter(['carlos', null], ['carlos', null]),
+      ).all()
+
+      assert.sameDeepMembers(obtainedTests, [test2, test1, test5])
+
+      // All those with name = 'carlos' and order by age where age is between 2 (open) and 30 (closed)
+      obtainedTests = await Test.withIndex(
+        'nameAge',
+        new BetweenFilter(['carlos', 2], ['carlos', 30], true, false),
+      ).all()
+
+      assert.sameDeepMembers(obtainedTests, [test1, test5])
+
+      // All those with name = 'carlos' and order by age where age is between 2 (closed) and 30 (open)
+      obtainedTests = await Test.withIndex(
+        'nameAge',
+        new BetweenFilter(['carlos', 2], ['carlos', 30], false, true),
+      ).all()
+
+      assert.sameDeepMembers(obtainedTests, [test2, test1])
+    })
+    it('should work with multiEntry indexes', async () => {
+      @Table({
+        indexes: {
+          tagsMI: '*tags',
+        },
+      })
+      class Test extends Model {
+        @Field({ primaryKey: true })
+        id!: number
+
+        @Field({ index: false })
+        tags!: string[]
+      }
+
+      await init('test', 1)
+
+      const test1 = await Test.create({ id: 1, tags: ['a', 'b', 'c'] })
+      const test2 = await Test.create({ id: 2, tags: ['a', 'b', 'd'] })
+      const test3 = await Test.create({ id: 3, tags: ['a', 'b', 'c'] })
+
+      const obtainedTests = await Test.withIndex('tagsMI', new BetweenFilter('c', 'c')).all()
+
+      assert.sameDeepMembers(obtainedTests, [test1, test3])
     })
   })
 })
