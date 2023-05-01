@@ -218,7 +218,7 @@ describe('Models', () => {
 
       assert.deepEqual(createdTest.keys, [1])
     })
-    it('should get the keys of an instance with a composite key', async () => {
+    it('should get the keys of an instance with a compound key', async () => {
       class Test extends Model {
         @Field({ primaryKey: true })
         id!: number
