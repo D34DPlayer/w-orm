@@ -3,7 +3,7 @@ import { assert } from 'chai'
 import { init } from '../src/connection'
 import { Model } from '../src/models'
 import { Field, Table } from '../src/fields'
-import { BetweenFilter, Query } from '../src/query'
+import { Between, Query } from '../src/query'
 import { WormError } from '../src/errors'
 
 describe('Query builder', () => {
@@ -507,19 +507,19 @@ describe('Query builder', () => {
       const test3 = await Test.create({ id: 3, name: 'test3' })
       const test4 = await Test.create({ id: 4, name: 'test4' })
 
-      let obtainedTests = await Test.filter({ id: new BetweenFilter(1, 2) }).all()
+      let obtainedTests = await Test.filter({ id: Between(1, 2) }).all()
       assert.sameDeepMembers(obtainedTests, [test1, test2])
 
-      obtainedTests = await Test.filter({ id: new BetweenFilter(2, 3, true, false) }).all()
+      obtainedTests = await Test.filter({ id: Between(2, 3, true, false) }).all()
       assert.sameDeepMembers(obtainedTests, [test3])
 
-      obtainedTests = await Test.filter({ id: new BetweenFilter(3, 4, true, true) }).all()
+      obtainedTests = await Test.filter({ id: Between(3, 4, true, true) }).all()
       assert.lengthOf(obtainedTests, 0)
 
-      obtainedTests = await Test.filter({ id: new BetweenFilter(1, null, true, false) }).all()
+      obtainedTests = await Test.filter({ id: Between(1, null, true, false) }).all()
       assert.sameDeepMembers(obtainedTests, [test2, test3, test4])
 
-      obtainedTests = await Test.filter({ id: new BetweenFilter(null, 3, false, true) }).all()
+      obtainedTests = await Test.filter({ id: Between(null, 3, false, true) }).all()
       assert.sameDeepMembers(obtainedTests, [test1, test2])
     })
     it('should allow range filters without indexing', async () => {
@@ -538,19 +538,19 @@ describe('Query builder', () => {
       const test3 = await Test.create({ id: 3, name: 'test3' })
       const test4 = await Test.create({ id: 4, name: 'test4' })
 
-      let obtainedTests = await Test.filter({ id: new BetweenFilter(1, 2) }).orderBy('name').all()
+      let obtainedTests = await Test.filter({ id: Between(1, 2) }).orderBy('name').all()
       assert.sameDeepMembers(obtainedTests, [test1, test2])
 
-      obtainedTests = await Test.filter({ id: new BetweenFilter(2, 3, true, false) }).orderBy('name').all()
+      obtainedTests = await Test.filter({ id: Between(2, 3, true, false) }).orderBy('name').all()
       assert.sameDeepMembers(obtainedTests, [test3])
 
-      obtainedTests = await Test.filter({ id: new BetweenFilter(3, 4, true, true) }).orderBy('name').all()
+      obtainedTests = await Test.filter({ id: Between(3, 4, true, true) }).orderBy('name').all()
       assert.lengthOf(obtainedTests, 0)
 
-      obtainedTests = await Test.filter({ id: new BetweenFilter(1, null, true, false) }).orderBy('name').all()
+      obtainedTests = await Test.filter({ id: Between(1, null, true, false) }).orderBy('name').all()
       assert.sameDeepMembers(obtainedTests, [test2, test3, test4])
 
-      obtainedTests = await Test.filter({ id: new BetweenFilter(null, 3, false, true) }).orderBy('name').all()
+      obtainedTests = await Test.filter({ id: Between(null, 3, false, true) }).orderBy('name').all()
       assert.sameDeepMembers(obtainedTests, [test1, test2])
     })
     it('should allow range filters with explicit index', async () => {
@@ -569,19 +569,19 @@ describe('Query builder', () => {
       const test3 = await Test.create({ id: 3, name: 'test3' })
       const test4 = await Test.create({ id: 4, name: 'test4' })
 
-      let obtainedTests = await Test.withIndex('id', new BetweenFilter(1, 2)).all()
+      let obtainedTests = await Test.withIndex('id', Between(1, 2)).all()
       assert.sameDeepMembers(obtainedTests, [test1, test2])
 
-      obtainedTests = await Test.withIndex('id', new BetweenFilter(2, 3, true, false)).all()
+      obtainedTests = await Test.withIndex('id', Between(2, 3, true, false)).all()
       assert.sameDeepMembers(obtainedTests, [test3])
 
-      obtainedTests = await Test.withIndex('id', new BetweenFilter(3, 4, true, true)).all()
+      obtainedTests = await Test.withIndex('id', Between(3, 4, true, true)).all()
       assert.lengthOf(obtainedTests, 0)
 
-      obtainedTests = await Test.withIndex('id', new BetweenFilter(1, null, true, false)).all()
+      obtainedTests = await Test.withIndex('id', Between(1, null, true, false)).all()
       assert.sameDeepMembers(obtainedTests, [test2, test3, test4])
 
-      obtainedTests = await Test.withIndex('id', new BetweenFilter(null, 3, false, true)).all()
+      obtainedTests = await Test.withIndex('id', Between(null, 3, false, true)).all()
       assert.sameDeepMembers(obtainedTests, [test1, test2])
     })
     it('shouldn\'t allow using an index and orderBy at the same time', async () => {
@@ -596,13 +596,13 @@ describe('Query builder', () => {
       await init('test', 1)
 
       assert.throws(() => {
-        Test.withIndex('id', new BetweenFilter(1, 2)).orderBy('name')
+        Test.withIndex('id', Between(1, 2)).orderBy('name')
       }, WormError)
       assert.throws(() => {
-        Test.orderBy('name').withIndex('id', new BetweenFilter(1, 2))
+        Test.orderBy('name').withIndex('id', Between(1, 2))
       }, WormError)
 
-      await Test.withIndex('id', new BetweenFilter(1, 2)).resetIndex().orderBy('name').all()
+      await Test.withIndex('id', Between(1, 2)).resetIndex().orderBy('name').all()
     })
     it('should work with compound indexes', async () => {
       @Table({
@@ -632,7 +632,7 @@ describe('Query builder', () => {
       // All those with name = 'carlos' and order by age
       let obtainedTests = await Test.withIndex(
         'nameAge',
-        new BetweenFilter(['carlos', null], ['carlos', null]),
+        Between(['carlos', null], ['carlos', null]),
       ).all()
 
       assert.sameDeepMembers(obtainedTests, [test2, test1, test5])
@@ -640,7 +640,7 @@ describe('Query builder', () => {
       // All those with name = 'carlos' and order by age where age is between 2 (open) and 30 (closed)
       obtainedTests = await Test.withIndex(
         'nameAge',
-        new BetweenFilter(['carlos', 2], ['carlos', 30], true, false),
+        Between(['carlos', 2], ['carlos', 30], true, false),
       ).all()
 
       assert.sameDeepMembers(obtainedTests, [test1, test5])
@@ -648,7 +648,7 @@ describe('Query builder', () => {
       // All those with name = 'carlos' and order by age where age is between 2 (closed) and 30 (open)
       obtainedTests = await Test.withIndex(
         'nameAge',
-        new BetweenFilter(['carlos', 2], ['carlos', 30], false, true),
+        Between(['carlos', 2], ['carlos', 30], false, true),
       ).all()
 
       assert.sameDeepMembers(obtainedTests, [test2, test1])
@@ -673,7 +673,7 @@ describe('Query builder', () => {
       const test2 = await Test.create({ id: 2, tags: ['a', 'b', 'd'] })
       const test3 = await Test.create({ id: 3, tags: ['a', 'b', 'c'] })
 
-      const obtainedTests = await Test.withIndex('tagsMI', new BetweenFilter('c', 'c')).all()
+      const obtainedTests = await Test.withIndex('tagsMI', Between('c', 'c')).all()
 
       assert.sameDeepMembers(obtainedTests, [test1, test3])
     })

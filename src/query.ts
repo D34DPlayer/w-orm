@@ -78,6 +78,27 @@ export class BetweenFilter<T> {
   }
 }
 
+/**
+ * A filter that checks if a value is between two values.
+ * @param lower - The lower bound of the filter
+ * @param upper - The upper bound of the filter
+ * @param lowerOpen - Whether the lower bound is open
+ * @param upperOpen - Whether the upper bound is open
+ * @typeParam T - The type of the value to filter
+ * @example
+ * ```ts
+ * // Get all users with an age between 20 and 30
+ * const query = User.filter({ age: BetweenFilter(20, 30) })
+ * // Get all users with an age between 20 and 30, excluding 20 and 30
+ * const query = User.filter({ age: BetweenFilter(20, 30, true, true) })
+ * // It is also used for custom indexes
+ * const query = User.withIndex('age', Between(10, 10))
+ * ```
+*/
+export function Between<T>(lower: T | null, upper: T | null, lowerOpen = false, upperOpen = false): BetweenFilter<T> {
+  return new BetweenFilter(lower, upper, lowerOpen, upperOpen)
+}
+
 export class Query<T extends Model> {
   /** The filters to apply to the query */
   private filters = {} as Filter<T>
