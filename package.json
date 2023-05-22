@@ -17,8 +17,14 @@
     "url": "https://github.com/D34DPlayer/w-orm/issues"
   },
   "sideEffects": false,
+  "exports": {
+    ".": {
+      "require": "./dist/index.umd.js",
+      "import": "./dist/index.mjs"
+    }
+  },
   "main": "dist/index.umd.js",
-  "module": "dist/index.esm.js",
+  "module": "dist/index.mjs",
   "types": "dist/types/index.d.ts",
   "files": [
     "dist/**/*"
@@ -28,11 +34,10 @@
     "lint:fix": "eslint . --fix",
     "prebuild": "rimraf dist",
     "build:lib": "tsc --module commonjs",
-    "build:dist": "rollup -c rollup.config.mjs",
+    "build:dist": "vite build",
     "build:docs": "typedoc",
-    "build": "pnpm build:lib && pnpm build:dist",
-    "start": "rollup -c rollup.config.js -w",
-    "serve": "serve .",
+    "build": "pnpm build:dist && pnpm build:lib",
+    "start": "vite",
     "prepare": "pnpm build",
     "prepublishOnly": "pnpm lint",
     "preversion": "pnpm lint",
@@ -48,11 +53,6 @@
   "devDependencies": {
     "@antfu/eslint-config": "^0.37.0",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
-    "@rollup/plugin-commonjs": "^24.0.1",
-    "@rollup/plugin-json": "^6.0.0",
-    "@rollup/plugin-node-resolve": "^15.0.1",
-    "@rollup/plugin-terser": "^0.4.1",
-    "@rollup/plugin-typescript": "^11.0.0",
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.15.10",
@@ -65,16 +65,18 @@
     "nyc": "^15.1.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^4.4.1",
-    "rollup": "^3.20.2",
-    "rollup-plugin-cleanup": "^3.2.1",
     "serve": "^14.2.0",
     "shelljs": "^0.8.5",
     "simple-git-hooks": "^2.8.1",
+    "terser": "^5.17.5",
     "ts-node": "^10.9.1",
     "tslib": "^2.5.0",
     "typedoc": "^0.23.28",
     "typedoc-theme-yaf": "^0.0.4",
-    "typescript": "~4.x"
+    "typescript": "~4.x",
+    "vite": "^4.3.8",
+    "vite-plugin-checker": "^0.6.0",
+    "vite-plugin-dts": "^2.3.0"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged"

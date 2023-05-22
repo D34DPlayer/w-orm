@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>W-ORM sample</title>
+</head>
+<body>
+    <main>
+        W-ORM sample app
+    </main>
+    <script type="module">
+        import * as WORM from '/src/index.ts'
+
+        class User extends WORM.Model {}
+
+        WORM.defineModel(User, {
+          id: { primaryKey: true },
+          name: { unique: true },
+          balance: { default: 0 },
+        })
+
+        await WORM.deleteDB('test')
+        await WORM.init('test', 1)
+    </script>
+</body>
+</html>
