@@ -1,4 +1,4 @@
-import { assert } from 'chai'
+import { assert, describe, it } from 'vitest'
 
 import { db, init } from '../src/connection'
 import { Model } from '../src/models'
