@@ -5,6 +5,7 @@
     "test/**/*",
     ".eslintrc.cjs",
     "rollup.config.mjs",
-    "typedoc.config.cjs"
+    "typedoc.config.cjs",
+    "vite.config.ts"
   ]
 }
