@@ -1,4 +1,5 @@
-import { assert } from 'chai'
+import { assert, describe, it } from 'vitest'
+
 import { Transaction, _objectStore } from '../src/transaction'
 import { Model } from '../src/models'
 import { Field } from '../src/fields'
@@ -9,19 +10,22 @@ describe('Connection Errors', () => {
       _objectStore('notFound', 'readwrite')
     }, /not connected/)
   })
-  it('should fail at Transaction', (done) => {
+  it('should fail at Transaction', async () => {
     class Test extends Model {
       @Field({ primaryKey: true })
       id!: number
     }
 
-    Transaction('readwrite', [Test], async () => {
-    // ...
-    }).then(() => {
-      done(new Error('Should have failed'))
-    }).catch((err: Error) => {
-      assert.match(err.message, /not connected/)
-      done()
+    await new Promise<void>((resolve, reject) => {
+      Transaction('readwrite', [Test], async () => {
+      // ...
+      }).then(() => {
+        reject(new Error('Should have failed'))
+      }).catch((err: Error) => {
+        assert.match(err.message, /not connected/)
+        resolve()
+      })
     })
-  })
+  },
+  )
 })

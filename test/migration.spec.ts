@@ -1,4 +1,5 @@
-import { assert } from 'chai'
+import { assert, describe, it } from 'vitest'
+
 import { db, disconnect, init } from '../src/connection'
 import { Field, defineModel } from '../src/fields'
 import { LenientModel, Model } from '../src/models'

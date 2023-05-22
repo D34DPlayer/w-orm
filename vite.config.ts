@@ -1,5 +1,5 @@
 import { resolve } from 'node:path'
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 
 import dts from 'vite-plugin-dts'
 import { checker } from 'vite-plugin-checker'
@@ -30,4 +30,14 @@ export default defineConfig({
             },
           }),
         ],
+  test: {
+    setupFiles: ['./test/setup.ts'],
+    // browser: {
+    //   enabled: true,
+    //   name: 'chrome', // browser name is required
+    // },
+    coverage: {
+      provider: 'c8', // or 'istanbul'
+    },
+  },
 })
