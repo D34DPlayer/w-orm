@@ -53,6 +53,7 @@ export async function init(dbName: string, version: number, migrations?: Migrati
         session: db.session,
         upgraded: false,
       })
+      return
     }
 
     const request = indexedDB.open(dbName, version)
