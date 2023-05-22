@@ -37,7 +37,7 @@ export default defineConfig({
     //   name: 'chrome', // browser name is required
     // },
     coverage: {
-      provider: 'c8', // or 'istanbul'
+      provider: 'istanbul', // or 'c8'
     },
   },
 })
