@@ -43,7 +43,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 7.30.3
+          version: 8.14.1
 
       - name: Setup node
         uses: actions/setup-node@v3
@@ -58,7 +58,7 @@ jobs:
         run: pnpm test:coverage
 
       - name: Upload coverage reports to Codecov
-        if: matrix.node == 18
+        if: matrix.node == 20
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
