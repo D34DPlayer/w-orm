@@ -33,8 +33,9 @@ jobs:
       matrix:
         node:
           # - 14 // Supported but breaks on build, not lts so not worth fixing
-          - 16
+          # - 16 // Supported except for the Blob tests
           - 18
+          - 20
     steps:
       - name: Checkout src
         uses: actions/checkout@v3
