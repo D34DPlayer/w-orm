@@ -7,6 +7,11 @@ import { Transaction } from '../src/transaction'
 import { exportDatabase, exportDatabaseToBlob, exportTable, importDatabase, importTable } from '../src/exporter'
 import { ConnectionError } from '../src/errors'
 
+function getNodeVersion(): number {
+  // eg. v16.18.1
+  return parseInt(process.version.split('.')[0].slice(1))
+}
+
 describe('DB Exporter', () => {
   it('fails when no connection has been established', async () => {
     class Test extends Model {
@@ -73,7 +78,7 @@ describe('DB Exporter', () => {
     })
   })
 
-  it('should be able to export to a JSON Blob', async () => {
+  it.skipIf(getNodeVersion() < 18)('should be able to export to a JSON Blob', async () => {
     class Test extends Model {
       @Field({ primaryKey: true })
       id!: number
