@@ -51,7 +51,11 @@ export abstract class Model implements Record<string, any> {
    * @param values - The values to initialize the model with
    * @returns - The new model instance
    */
-  public static async create<T extends Model>(this: { new(): T }, values: Partial<T>, tx?: IDBTransaction): Promise<T> {
+  public static async create<T extends Model>(
+    this: { new (): T },
+    values: Partial<T>,
+    tx?: IDBTransaction,
+  ): Promise<T> {
     const instance = new this()
     Object.assign(instance, values)
 
@@ -61,17 +65,15 @@ export abstract class Model implements Record<string, any> {
 
     for (const [field, fieldOpts] of Object.entries(tableDef.fields)) {
       // Check if field is defined
-      if (instance[(field as keyof T)] === undefined) {
+      if (instance[field as keyof T] === undefined) {
         // Check if field has a default value
         if (fieldOpts.default !== undefined && fieldOpts.default !== null) {
           // Check if default value is a generator
           if (fieldOpts.default instanceof Function)
-            instance[(field as keyof T)] = fieldOpts.default() as T[keyof T]
-          else
-            instance[(field as keyof T)] = fieldOpts.default as T[keyof T]
+            instance[field as keyof T] = fieldOpts.default() as T[keyof T]
+          else instance[field as keyof T] = fieldOpts.default as T[keyof T]
         }
-        else
-        if (!fieldOpts.nullable) {
+        else if (!fieldOpts.nullable) {
           throw new ModelError(`Field ${field} is not nullable`)
         }
       }
@@ -96,7 +98,11 @@ export abstract class Model implements Record<string, any> {
    * @param key - The primary key of the model
    * @returns - The model instance or null if not found
    */
-  public static async get<T extends Model>(this: { new(): T }, key: IDBValidKey, tx?: IDBTransaction): Promise<T | null> {
+  public static async get<T extends Model>(
+    this: { new (): T },
+    key: IDBValidKey,
+    tx?: IDBTransaction,
+  ): Promise<T | null> {
     const store = _objectStore(this.name, tx)
     return new Promise((resolve, reject) => {
       const request = store.get(Array.isArray(key) ? key : [key])
@@ -120,8 +126,11 @@ export abstract class Model implements Record<string, any> {
    * Get all model instances.
    * @returns - The model instances
    */
-  public static async all<T extends Model>(this: { new(): T }, tx?: IDBTransaction): Promise<T[]> {
-    return (new Query(this)).all(tx)
+  public static async all<T extends Model>(
+    this: { new (): T },
+    tx?: IDBTransaction,
+  ): Promise<T[]> {
+    return new Query(this).all(tx)
   }
 
   /**
@@ -141,15 +150,22 @@ export abstract class Model implements Record<string, any> {
    * })
    * ```
    */
-  public static async forEach<T extends Model>(this: { new(): T }, callback: ForEachCallback<T>, tx?: IDBTransaction): Promise<void> {
-    return (new Query(this)).forEach(callback, tx)
+  public static async forEach<T extends Model>(
+    this: { new (): T },
+    callback: ForEachCallback<T>,
+    tx?: IDBTransaction,
+  ): Promise<void> {
+    return new Query(this).forEach(callback, tx)
   }
 
   /**
    * Get how many model instances there are.
    * @returns - The number of model instances
    */
-  public static async count<T extends Model>(this: { new(): T }, tx?: IDBTransaction): Promise<number> {
+  public static async count<T extends Model>(
+    this: { new (): T },
+    tx?: IDBTransaction,
+  ): Promise<number> {
     return new Promise<number>((resolve, reject) => {
       const store = _objectStore(this.name, tx)
       const request = store.count()
@@ -169,8 +185,11 @@ export abstract class Model implements Record<string, any> {
    * @param filters - The filters to apply
    * @returns - The new query
    */
-  public static filter<T extends Model>(this: { new(): T }, filters: Filter<T>): Query<T> {
-    return (new Query(this)).filter(filters)
+  public static filter<T extends Model>(
+    this: { new (): T },
+    filters: Filter<T>,
+  ): Query<T> {
+    return new Query(this).filter(filters)
   }
 
   /**
@@ -180,8 +199,11 @@ export abstract class Model implements Record<string, any> {
    * @param orderBy - The field to order by, prepend a `-` to reverse the order
    * @returns - The new query
    */
-  public static orderBy<T extends Model>(this: { new(): T }, orderBy: OrderBy<T>): Query<T> {
-    return (new Query(this)).orderBy(orderBy)
+  public static orderBy<T extends Model>(
+    this: { new (): T },
+    orderBy: OrderBy<T>,
+  ): Query<T> {
+    return new Query(this).orderBy(orderBy)
   }
 
   /**
@@ -192,8 +214,12 @@ export abstract class Model implements Record<string, any> {
    * @param query - A query to filter the index
    * @returns - The new query
    */
-  public static withIndex<T extends Model>(this: { new(): T }, index: string, query: BetweenFilter<unknown>): Query<T> {
-    return (new Query(this)).withIndex(index, query)
+  public static withIndex<T extends Model>(
+    this: { new (): T },
+    index: string,
+    query: BetweenFilter<unknown>,
+  ): Query<T> {
+    return new Query(this).withIndex(index, query)
   }
 
   /**
@@ -276,5 +302,5 @@ export abstract class Model implements Record<string, any> {
 
 export abstract class LenientModel extends Model {
   /** Allows setting extra elements in a model, since this is allowed by IDB */
-  [key: string]: unknown
+  [key: string]: unknown;
 }

@@ -18,14 +18,15 @@ describe('Connection Errors', () => {
 
     await new Promise<void>((resolve, reject) => {
       Transaction('readwrite', [Test], async () => {
-      // ...
-      }).then(() => {
-        reject(new Error('Should have failed'))
-      }).catch((err: Error) => {
-        assert.match(err.message, /not connected/)
-        resolve()
+        // ...
       })
+        .then(() => {
+          reject(new Error('Should have failed'))
+        })
+        .catch((err: Error) => {
+          assert.match(err.message, /not connected/)
+          resolve()
+        })
     })
-  },
-  )
+  })
 })

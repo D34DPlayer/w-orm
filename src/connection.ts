@@ -35,6 +35,8 @@ function _updateDB(_db: IDBDatabase, dbName: string, version: number) {
  * 2. There's no version bump, a new connection is created
  * 3. There's a version bump, a new connection is created, migrations are applied and tables created
  *
+ * @see {@link Types.MigrationList}: For more information on migrations
+ *
  * @example
  * ```js
  * const initResp = await init('my-db', 1)
@@ -44,9 +46,14 @@ function _updateDB(_db: IDBDatabase, dbName: string, version: number) {
  * ```
  * @param dbName - The database name
  * @param version - The database version, a version bump will trigger an upgrade
+ * @param migrations - A list of migrations to be applied
  * @returns {Promise<InitResponse>} - The database connection and whether an upgrade was performed
  */
-export async function init(dbName: string, version: number, migrations?: MigrationList): Promise<InitResponse> {
+export async function init(
+  dbName: string,
+  version: number,
+  migrations?: MigrationList,
+): Promise<InitResponse> {
   return new Promise<InitResponse>((resolve, reject) => {
     if (db.connected) {
       resolve({
@@ -76,7 +83,11 @@ export async function init(dbName: string, version: number, migrations?: Migrati
 
       _updateDB(request.result, dbName, version)
 
-      const ctx = new MigrationContext(request.result, request.transaction, migrations || {})
+      const ctx = new MigrationContext(
+        request.result,
+        request.transaction,
+        migrations || {},
+      )
 
       try {
         await ctx.runMigrations(ev.oldVersion, ev.newVersion)

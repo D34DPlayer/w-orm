@@ -1,6 +1,6 @@
 import type { Migration, MigrationList } from './types'
 
-type MigrationItem = [number, Migration]
+export type MigrationItem = [number, Migration]
 
 /**
  * Context passed to migrations.
@@ -15,9 +15,15 @@ export class MigrationContext {
    * @param tx - The transaction
    * @param migrations - The migrations to run
    */
-  constructor(public db: IDBDatabase, public tx: IDBTransaction, migrations: MigrationList) {
-    this.migrations = Object.entries(migrations)
-      .map(([version, migration]) => [parseInt(version), migration])
+  constructor(
+    public db: IDBDatabase,
+    public tx: IDBTransaction,
+    migrations: MigrationList,
+  ) {
+    this.migrations = Object.entries(migrations).map(([version, migration]) => [
+      parseInt(version),
+      migration,
+    ])
 
     this.migrations.sort(([a], [b]) => a - b)
   }
@@ -32,9 +38,10 @@ export class MigrationContext {
     if (newVersion === null)
       return
 
-    const migrations = this.migrations.filter(([version]) => version > oldVersion && version <= newVersion)
-    for (const [_, migration] of migrations)
-      await migration(this)
+    const migrations = this.migrations.filter(
+      ([version]) => version > oldVersion && version <= newVersion,
+    )
+    for (const [_, migration] of migrations) await migration(this)
   }
 
   /**

@@ -8,5 +8,6 @@ module.exports = {
     '@typescript-eslint/no-inferrable-types': 'off',
     'unused-imports/no-unused-vars': 'off',
     '@typescript-eslint/require-await': 'off',
+    '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
   },
 }

@@ -1,5 +1,14 @@
-import type { Constructor, FieldOptions, TableDefinition, TableOptions } from './types'
-import { _addFieldToMetadata, _handleTableData, _overrideTableData } from './metadata'
+import type {
+  Constructor,
+  FieldOptions,
+  TableDefinition,
+  TableOptions,
+} from './types'
+import {
+  _addFieldToMetadata,
+  _handleTableData,
+  _overrideTableData,
+} from './metadata'
 import { ModelError, WormError } from './errors'
 import type { Model } from './models'
 
@@ -41,7 +50,9 @@ import type { Model } from './models'
  * ```
  * @param options
  */
-export function Field<T>(options: Partial<FieldOptions<T>> = {}): PropertyDecorator {
+export function Field<T>(
+  options: Partial<FieldOptions<T>> = {},
+): PropertyDecorator {
   return function (object, propertyName) {
     if (typeof propertyName === 'symbol')
       throw new WormError('Field decorator doesn\'t support symbols')
@@ -49,7 +60,8 @@ export function Field<T>(options: Partial<FieldOptions<T>> = {}): PropertyDecora
     // Use "emitDecoratorMetadata" to get the type of the field
     let t: () => T
     try {
-      t = (Reflect.getMetadata('design:type', object, propertyName) || Object) as () => T
+      t = (Reflect.getMetadata('design:type', object, propertyName)
+        || Object) as () => T
     }
     catch {
       t = Object
@@ -93,7 +105,11 @@ export function Field<T>(options: Partial<FieldOptions<T>> = {}): PropertyDecora
  * })
  * ```
  */
-export function defineModel<T extends Model>(modelClass: Constructor<T>, definition: TableDefinition, options: TableOptions = {}) {
+export function defineModel<T extends Model>(
+  modelClass: Constructor<T>,
+  definition: TableDefinition,
+  options: TableOptions = {},
+) {
   for (const field in definition) {
     const fieldOpts = definition[field]
     Field(fieldOpts)(modelClass.prototype as T, field)
@@ -102,6 +118,44 @@ export function defineModel<T extends Model>(modelClass: Constructor<T>, definit
   _overrideTableData(modelClass.prototype, options)
 }
 
+/*
+ * Define a table's metadata.
+ * @param options - The table's options
+ *
+ * @example
+ * ```ts
+ * // Abstract classes don't represent an actual table but can be used as a base for other tables.
+ * @Table({ abstract: true })
+ * class BaseModel extends Model {
+ *   @Field({ primaryKey: true })
+ *   id: number
+ *   @Field({ nullable: false })
+ *   createdAt: Date
+ * }
+ *
+ * // Tables can be renamed using the name option.
+ * @Table({ name: "users" })
+ * class User extends BaseModel {
+ *   @Field({ unique: true })
+ *   username: string
+ * }
+ *
+ * // Indexes can be defined using the indexes option.
+ * @Table({
+ *   indexes: {
+ *     recentSpecificLang: { fields: ["lang", "createdAt"] },
+ *   }
+ * })
+ * class Translation extends BaseModel {
+ *   @Field({ nullable: false })
+ *   lang: string
+ *   @Field({ nullable: false })
+ *   text: string
+ * }
+ * ```
+ *
+ * @see {@link Types.Index} for more information about indexes.
+ */
 export function Table(options: TableOptions = {}): ClassDecorator {
   return function (constructor) {
     _overrideTableData(constructor.prototype, options)

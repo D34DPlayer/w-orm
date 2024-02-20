@@ -1,12 +1,25 @@
-import type { Constructor, TransactionCallback, TransactionOrMode } from './types'
+import type {
+  Constructor,
+  TransactionCallback,
+  TransactionOrMode,
+} from './types'
 import { db } from './connection'
 import { ConnectionError, WormError } from './errors'
 import type { Model } from './models'
 import { TablesMetadata } from './metadata'
 
-export function _objectStore(storeName: string, tx?: IDBTransaction): IDBObjectStore
-export function _objectStore(storeName: string, mode?: IDBTransactionMode): IDBObjectStore
-export function _objectStore(storeName: string, txOrMode?: TransactionOrMode): IDBObjectStore
+export function _objectStore(
+  storeName: string,
+  tx?: IDBTransaction,
+): IDBObjectStore
+export function _objectStore(
+  storeName: string,
+  mode?: IDBTransactionMode,
+): IDBObjectStore
+export function _objectStore(
+  storeName: string,
+  txOrMode?: TransactionOrMode,
+): IDBObjectStore
 
 /**
  * Utility function to get an object store from the global database connection
@@ -15,7 +28,10 @@ export function _objectStore(storeName: string, txOrMode?: TransactionOrMode): I
  * @returns { IDBObjectStore } - The object store
  * @internal
  */
-export function _objectStore(storeName: string, txOrMode?: TransactionOrMode): IDBObjectStore {
+export function _objectStore(
+  storeName: string,
+  txOrMode?: TransactionOrMode,
+): IDBObjectStore {
   if (storeName in TablesMetadata)
     storeName = TablesMetadata[storeName].tableName
 
@@ -58,7 +74,11 @@ export function _objectStore(storeName: string, txOrMode?: TransactionOrMode): I
  * @param transactionCallback - The callback to execute in the transaction
  * @returns - The result of the transactionCallback
  */
-export async function Transaction<T>(mode: IDBTransactionMode, models: Constructor<Model>[], transactionCallback: TransactionCallback<T>): Promise<T> {
+export async function Transaction<T>(
+  mode: IDBTransactionMode,
+  models: Constructor<Model>[],
+  transactionCallback: TransactionCallback<T>,
+): Promise<T> {
   if (!db.connected)
     throw new ConnectionError('Database is not connected')
   const stores = models.map(model => model.name)
@@ -87,7 +107,9 @@ export async function Transaction<T>(mode: IDBTransactionMode, models: Construct
   if (!callbackDone) {
     // If the callback is still pending, it means that it's waiting for a non transactional operation.
     // We can't prevent it to continue using the transaction, so we have to throw an error.
-    throw new WormError('The transaction committed, but the callback is still pending. Make sure to not await any non transactional operation in it.')
+    throw new WormError(
+      'The transaction committed, but the callback is still pending. Make sure to not await any non transactional operation in it.',
+    )
   }
 
   // The callback is done, so it has to be its result
