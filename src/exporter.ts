@@ -1,7 +1,7 @@
 import { db } from './connection'
 import { ConnectionError } from './errors'
 
-/*
+/**
  * Export a table from the database
  * This is equivalent to calling Table.all() but without wrapping the result in the table class.
  *
@@ -28,7 +28,7 @@ export async function exportTable(table: string): Promise<unknown[]> {
   })
 }
 
-/*
+/**
  * Import data into a table
  * @param table - The name of the table to import into
  * @param entries - The data to import
@@ -65,7 +65,7 @@ export async function importTable(
   return Promise.all(promises).then(x => x.length)
 }
 
-/*
+/**
  * Export the entire database.
  * @param blacklist - An array of table names to exclude from the export
  * @returns An object containing the data from each table in the database
@@ -86,7 +86,7 @@ export async function exportDatabase(
   return exportData
 }
 
-/*
+/**
  * Import data into the database. The tables are expected to exist.
  *
  * @param data - An object containing the data to import
@@ -112,7 +112,7 @@ export async function importDatabase(
   )
 }
 
-/*
+/**
  * Convert an object to a Blob.
  * In node.js, blobs are only available >=18.
  *
@@ -124,7 +124,7 @@ function objectToBlob(object: unknown): Blob {
   return new Blob([str], { type: 'application/json' })
 }
 
-/*
+/**
  * Export the entire database to a Blob.
  * This can then be used to save the database to disk.
  */
