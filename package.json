@@ -1,6 +1,6 @@
 {
   "name": "@d34d/w-orm",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "IndexedDB ORM",
   "author": {
     "name": "D34DPlayer",
