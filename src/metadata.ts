@@ -1,10 +1,16 @@
-import type { FieldOptions, Index, ParsedIndexes, TableMetadata, TableOptions } from './types'
+import type {
+  FieldOptions,
+  Index,
+  ParsedIndexes,
+  TableMetadata,
+  TableOptions,
+} from './types'
 import type { Model } from './models'
 import { ModelError, WormError } from './errors'
 
 /**
  * Global object storing the tables and their fields definitions.
- * It is populated by all the {@link Field} decorators used in the application, or by calling {@link defineModel}
+ * It is populated by all the {@link W-ORM.Field} decorators used in the application, or by calling {@link W-ORM.defineModel}
  *
  * It should be treated as read-only, even though it is not.
  *
@@ -20,7 +26,11 @@ export const TablesMetadata: Record<string, TableMetadata> = {}
  * @param options - The field's options
  * @internal
  */
-export function _addFieldToMetadata<T>(tableName: string, fieldName: string, options: FieldOptions<T>) {
+export function _addFieldToMetadata<T>(
+  tableName: string,
+  fieldName: string,
+  options: FieldOptions<T>,
+) {
   if (!TablesMetadata[tableName])
     throw new WormError(`Table ${tableName} is not defined`)
   TablesMetadata[tableName].fields[fieldName] = options
@@ -31,8 +41,7 @@ export function _addFieldToMetadata<T>(tableName: string, fieldName: string, opt
  * @internal
  */
 export function _resetMetadata() {
-  for (const tableName in TablesMetadata)
-    delete TablesMetadata[tableName]
+  for (const tableName in TablesMetadata) delete TablesMetadata[tableName]
 }
 
 /**
@@ -56,7 +65,9 @@ export function _handleTableData<T>(instance: T) {
     tableName: modelClassName,
   }
 
-  const parentName = (Object.getPrototypeOf(instance.constructor) as typeof Model).name
+  const parentName = (
+    Object.getPrototypeOf(instance.constructor) as typeof Model
+  ).name
 
   if (parentName in TablesMetadata) {
     const parentMetadata = TablesMetadata[parentName]
@@ -74,7 +85,10 @@ export function _handleTableData<T>(instance: T) {
   }
 }
 
-export function _overrideTableData<T>(instance: T, tableOptions: TableOptions = {}) {
+export function _overrideTableData<T>(
+  instance: T,
+  tableOptions: TableOptions = {},
+) {
   if (!instance)
     return
 
@@ -125,7 +139,10 @@ export function getPrimaryKeys(modelName: string): string[] {
 export function createTables(session: IDBDatabase, tx: IDBTransaction): void {
   for (const modelName in TablesMetadata) {
     const metadata = TablesMetadata[modelName]
-    if (metadata.abstract || (metadata.abstract === undefined && metadata.hasChild))
+    if (
+      metadata.abstract
+      || (metadata.abstract === undefined && metadata.hasChild)
+    )
       continue
 
     const tableName = metadata.tableName
@@ -136,19 +153,27 @@ export function createTables(session: IDBDatabase, tx: IDBTransaction): void {
     let store: IDBObjectStore
     if (session.objectStoreNames.contains(tableName)) {
       store = tx.objectStore(tableName)
-      const currentKeys = Array.isArray(store.keyPath) ? store.keyPath : [store.keyPath]
+      const currentKeys = Array.isArray(store.keyPath)
+        ? store.keyPath
+        : [store.keyPath]
 
-      if (!_compareArrays(currentKeys, primaryKeys))
-        throw new ModelError(`Table ${tableName} has a different primary key than the one in the database.`)
+      if (!_compareArrays(currentKeys, primaryKeys)) {
+        throw new ModelError(
+          `Table ${tableName} has a different primary key than the one in the database.`,
+        )
+      }
     }
     else {
       store = session.createObjectStore(tableName, { keyPath: primaryKeys })
     }
 
     const oldIndexes = new Set(store.indexNames)
-    const newIndexes = new Set(Object.keys(tableFields).filter(fieldName => tableFields[fieldName].index))
-    for (const indexName in extraIndexes)
-      newIndexes.add(indexName)
+    const newIndexes = new Set(
+      Object.keys(tableFields).filter(
+        fieldName => tableFields[fieldName].index,
+      ),
+    )
+    for (const indexName in extraIndexes) newIndexes.add(indexName)
 
     for (const oldIndex of oldIndexes) {
       if (!newIndexes.has(oldIndex))
@@ -182,19 +207,26 @@ export function createTables(session: IDBDatabase, tx: IDBTransaction): void {
  * @param indexDef - The definition of the new index
  * @internal
  */
-function _createIndex(oldIndexes: Set<string>, store: IDBObjectStore, newIndex: string, indexDef: Index) {
+function _createIndex(
+  oldIndexes: Set<string>,
+  store: IDBObjectStore,
+  newIndex: string,
+  indexDef: Index,
+) {
   if (oldIndexes.has(newIndex)) {
     const oldIndex = store.index(newIndex)
     if (!_compareIndex(oldIndex, indexDef))
       store.deleteIndex(newIndex)
-    else
-      return
+    else return
   }
 
-  const keyPath = indexDef.fields.length > 1 ? indexDef.fields : indexDef.fields[0]
+  const keyPath
+    = indexDef.fields.length > 1 ? indexDef.fields : indexDef.fields[0]
 
-  store.createIndex(newIndex, keyPath,
-    { unique: indexDef.unique, multiEntry: indexDef.multiEntry })
+  store.createIndex(newIndex, keyPath, {
+    unique: indexDef.unique,
+    multiEntry: indexDef.multiEntry,
+  })
 }
 
 /**
@@ -205,9 +237,11 @@ function _createIndex(oldIndexes: Set<string>, store: IDBObjectStore, newIndex: 
  * @internal
  */
 export function _compareIndex(index: IDBIndex, field: Index): boolean {
-  return (index.unique === field.unique
+  return (
+    index.unique === field.unique
     && index.multiEntry === field.multiEntry
-    && _compareArrays(Array.from(index.keyPath), field.fields))
+    && _compareArrays(Array.from(index.keyPath), field.fields)
+  )
 }
 
 /**

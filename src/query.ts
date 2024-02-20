@@ -1,4 +1,13 @@
-import type { CursorCallback, Filter, ForEachCallback, ModelFieldKey, ModelFields, OrderBy, SimpleFilter, TransactionOrMode } from './types'
+import type {
+  CursorCallback,
+  Filter,
+  ForEachCallback,
+  ModelFieldKey,
+  ModelFields,
+  OrderBy,
+  SimpleFilter,
+  TransactionOrMode,
+} from './types'
 import type { Model } from './models'
 import { _objectStore } from './transaction'
 import { WormError } from './errors'
@@ -25,7 +34,12 @@ export class BetweenFilter<T> {
    * const query = User.filter({ age: new BetweenFilter(20, 30, true, true) })
    * ```
    */
-  constructor(public lower: T | null, public upper: T | null, public lowerOpen = false, public upperOpen = false) {}
+  constructor(
+    public lower: T | null,
+    public upper: T | null,
+    public lowerOpen = false,
+    public upperOpen = false,
+  ) {}
 
   /**
    * Recursively replaces the null values with the default value.
@@ -63,16 +77,14 @@ export class BetweenFilter<T> {
       lowerCmp = true
     else if (this.lowerOpen)
       lowerCmp = value > this.lower
-    else
-      lowerCmp = value >= this.lower
+    else lowerCmp = value >= this.lower
 
     let upperCmp = false
     if (this.upper === null || this.upper === undefined)
       upperCmp = true
     else if (this.upperOpen)
       upperCmp = value < this.upper
-    else
-      upperCmp = value <= this.upper
+    else upperCmp = value <= this.upper
 
     return lowerCmp && upperCmp
   }
@@ -94,8 +106,13 @@ export class BetweenFilter<T> {
  * // It is also used for custom indexes
  * const query = User.withIndex('age', Between(10, 10))
  * ```
-*/
-export function Between<T>(lower: T | null, upper: T | null, lowerOpen = false, upperOpen = false): BetweenFilter<T> {
+ */
+export function Between<T>(
+  lower: T | null,
+  upper: T | null,
+  lowerOpen = false,
+  upperOpen = false,
+): BetweenFilter<T> {
   return new BetweenFilter(lower, upper, lowerOpen, upperOpen)
 }
 
@@ -127,7 +144,7 @@ export class Query<T extends Model> {
    * @typeParam T - The model to query
    * @param TargetModel - The model to query
    */
-  public constructor(private TargetModel: { new(): T }) {}
+  public constructor(private TargetModel: { new (): T }) {}
 
   /**
    * Update the filters of the query.
@@ -182,8 +199,11 @@ export class Query<T extends Model> {
    * const query = User.orderBy('-name')
    */
   public orderBy(field: OrderBy<T>): Query<T> {
-    if (this._index)
-      throw new WormError('Cannot order by field when using an index: order it manually, or use `resetIndex` instead')
+    if (this._index) {
+      throw new WormError(
+        'Cannot order by field when using an index: order it manually, or use `resetIndex` instead',
+      )
+    }
 
     if (field.startsWith('-')) {
       this._reverse = true
@@ -255,9 +275,15 @@ export class Query<T extends Model> {
    * @param query - The query to use on the index
    * @returns
    */
-  public withIndex(index: ModelFieldKey<T> | string, query?: BetweenFilter<unknown>): Query<T> {
-    if (this._orderBy)
-      throw new WormError('Cannot order by field when using an index: order it manually or don\'t use an index')
+  public withIndex(
+    index: ModelFieldKey<T> | string,
+    query?: BetweenFilter<unknown>,
+  ): Query<T> {
+    if (this._orderBy) {
+      throw new WormError(
+        'Cannot order by field when using an index: order it manually or don\'t use an index',
+      )
+    }
 
     this._index = index
     if (query)
@@ -292,7 +318,7 @@ export class Query<T extends Model> {
       }
       else {
         // If the value is not a function, we compare it with the instance's value
-        if (instance[key as keyof T] !== value as T[keyof T])
+        if (instance[key as keyof T] !== (value as T[keyof T]))
           return false
       }
     }
@@ -305,7 +331,7 @@ export class Query<T extends Model> {
    * Otherwise, it will return a key range with just the value.
    * @param value - The value of the simple filter
    * @returns - The key range for the simple filter
-  */
+   */
   private _getKeyRange(value: unknown): IDBKeyRange {
     if (value instanceof BetweenFilter)
       return value.keyRange()
@@ -319,13 +345,18 @@ export class Query<T extends Model> {
    * Otherwise, if the query has a simple filter, it will use the index of the filter + add a query.
    * @returns
    */
-  private _getCursor(txOrMode: TransactionOrMode = 'readonly'): IDBRequest<IDBCursorWithValue | null> {
+  private _getCursor(
+    txOrMode: TransactionOrMode = 'readonly',
+  ): IDBRequest<IDBCursorWithValue | null> {
     const store = _objectStore(this.TargetModel.name, txOrMode)
 
     if (this._index) {
       const index = store.index(this._index)
 
-      return index.openCursor(this._indexQuery?.keyRange(), this._reverse ? 'prev' : 'next')
+      return index.openCursor(
+        this._indexQuery?.keyRange(),
+        this._reverse ? 'prev' : 'next',
+      )
     }
 
     if (this._orderBy) {
@@ -339,7 +370,10 @@ export class Query<T extends Model> {
     if (simpleFilter) {
       const index = store.index(simpleFilter.key)
 
-      return index.openCursor(this._getKeyRange(simpleFilter.value), this._reverse ? 'prev' : 'next')
+      return index.openCursor(
+        this._getKeyRange(simpleFilter.value),
+        this._reverse ? 'prev' : 'next',
+      )
     }
 
     return store.openCursor(undefined, this._reverse ? 'prev' : 'next')
@@ -369,7 +403,10 @@ export class Query<T extends Model> {
    * @param txOrMode - The transaction or mode to use
    * @returns - A promise that resolves when the cursor is done
    */
-  private _cursorLogic(valueCallback: CursorCallback, txOrMode?: TransactionOrMode): Promise<void> {
+  private _cursorLogic(
+    valueCallback: CursorCallback,
+    txOrMode?: TransactionOrMode,
+  ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const request = this._getCursor(txOrMode)
       let matches = 0
@@ -386,7 +423,7 @@ export class Query<T extends Model> {
           return
         }
         // If we have a limit, we check if we have reached it
-        if ((matches - skipped) === this._limit) {
+        if (matches - skipped === this._limit) {
           resolve()
           return
         }
@@ -552,7 +589,10 @@ export class Query<T extends Model> {
    * })
    * ```
    */
-  async forEach(callback: ForEachCallback<T>, txOrMode: TransactionOrMode = 'readonly'): Promise<void> {
+  async forEach(
+    callback: ForEachCallback<T>,
+    txOrMode: TransactionOrMode = 'readonly',
+  ): Promise<void> {
     await this._cursorLogic(async (cursor, tx) => {
       const instance = new this.TargetModel()
       Object.assign(instance, cursor.value)

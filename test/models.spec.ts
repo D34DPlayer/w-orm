@@ -59,11 +59,15 @@ describe('Models', () => {
 
       await init('test', 1)
 
-      await Test.create({ id: 1 }).then(() => {
-        assert.fail('Should not be able to create a non-nullable field without a value')
-      }).catch((err: Error) => {
-        assert.equal(err.name, 'ModelError')
-      })
+      await Test.create({ id: 1 })
+        .then(() => {
+          assert.fail(
+            'Should not be able to create a non-nullable field without a value',
+          )
+        })
+        .catch((err: Error) => {
+          assert.equal(err.name, 'ModelError')
+        })
     })
     it('should use default values', async () => {
       class Test extends Model {
@@ -160,7 +164,11 @@ describe('Models', () => {
 
       const obtainedTests = await Test.all()
 
-      assert.sameDeepMembers(obtainedTests, [createdTest1, createdTest2, createdTest3])
+      assert.sameDeepMembers(obtainedTests, [
+        createdTest1,
+        createdTest2,
+        createdTest3,
+      ])
     })
     it('should return an empty array if there are no instances', async () => {
       class Test extends Model {

@@ -69,7 +69,10 @@ describe('Migration system', () => {
     ] as Test2[])
 
     const store = _objectStore('Test')
-    assert(store.indexNames.contains('name'), 'Index "name" should have been created')
+    assert(
+      store.indexNames.contains('name'),
+      'Index "name" should have been created',
+    )
     // #endregion Second version
   })
   it('should be able to remove a field', async () => {
@@ -109,7 +112,10 @@ describe('Migration system', () => {
     await init('test', 2)
 
     const store = _objectStore('Test')
-    assert(!store.indexNames.contains('name'), 'Index "name" should have been removed')
+    assert(
+      !store.indexNames.contains('name'),
+      'Index "name" should have been removed',
+    )
   })
   it('should fail when the primary key has been changed', async () => {
     // First version
@@ -143,12 +149,14 @@ describe('Migration system', () => {
     })
 
     await new Promise<void>((resolve, reject) => {
-      init('test', 2).then(() => {
-        reject(new Error('Should have failed'))
-      }).catch((e: Error) => {
-        assert.match(e.message, /different primary key/)
-        resolve()
-      })
+      init('test', 2)
+        .then(() => {
+          reject(new Error('Should have failed'))
+        })
+        .catch((e: Error) => {
+          assert.match(e.message, /different primary key/)
+          resolve()
+        })
     })
   })
   it('should expose table names', async () => {

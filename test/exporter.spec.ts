@@ -4,7 +4,13 @@ import { Model } from '../src/models'
 import { init } from '../src/connection'
 import { Field } from '../src/fields'
 import { Transaction } from '../src/transaction'
-import { exportDatabase, exportDatabaseToBlob, exportTable, importDatabase, importTable } from '../src/exporter'
+import {
+  exportDatabase,
+  exportDatabaseToBlob,
+  exportTable,
+  importDatabase,
+  importTable,
+} from '../src/exporter'
 import { ConnectionError } from '../src/errors'
 
 function getNodeVersion(): number {
@@ -19,18 +25,26 @@ describe('DB Exporter', () => {
       id!: number
     }
 
-    await exportTable(Test.name).then(() => assert.fail('Should have failed')).catch((e) => {
-      assert.isTrue(e instanceof ConnectionError)
-    })
-    await exportDatabase().then(() => assert.fail('Should have failed')).catch((e) => {
-      assert.isTrue(e instanceof ConnectionError)
-    })
-    await importTable(Test.name, []).then(() => assert.fail('Should have failed')).catch((e) => {
-      assert.isTrue(e instanceof ConnectionError)
-    })
-    await importDatabase({ Test: [] }).then(() => assert.fail('Should have failed')).catch((e) => {
-      assert.isTrue(e instanceof ConnectionError)
-    })
+    await exportTable(Test.name)
+      .then(() => assert.fail('Should have failed'))
+      .catch((e) => {
+        assert.isTrue(e instanceof ConnectionError)
+      })
+    await exportDatabase()
+      .then(() => assert.fail('Should have failed'))
+      .catch((e) => {
+        assert.isTrue(e instanceof ConnectionError)
+      })
+    await importTable(Test.name, [])
+      .then(() => assert.fail('Should have failed'))
+      .catch((e) => {
+        assert.isTrue(e instanceof ConnectionError)
+      })
+    await importDatabase({ Test: [] })
+      .then(() => assert.fail('Should have failed'))
+      .catch((e) => {
+        assert.isTrue(e instanceof ConnectionError)
+      })
   })
   it('should be able to export a single table', async () => {
     class Test extends Model {
@@ -78,26 +92,29 @@ describe('DB Exporter', () => {
     })
   })
 
-  it.skipIf(getNodeVersion() < 18)('should be able to export to a JSON Blob', async () => {
-    class Test extends Model {
-      @Field({ primaryKey: true })
-      id!: number
+  it.skipIf(getNodeVersion() < 18)(
+    'should be able to export to a JSON Blob',
+    async () => {
+      class Test extends Model {
+        @Field({ primaryKey: true })
+        id!: number
 
-      random!: number
-    }
+        random!: number
+      }
 
-    await init('test', 1)
-    await Transaction('readwrite', [Test], async (tx) => {
-      const promises: Promise<Test>[] = []
-      for (let i = 0; i < 10000; i++)
-        promises.push(Test.create({ id: i, random: Math.random() }, tx))
+      await init('test', 1)
+      await Transaction('readwrite', [Test], async (tx) => {
+        const promises: Promise<Test>[] = []
+        for (let i = 0; i < 10000; i++)
+          promises.push(Test.create({ id: i, random: Math.random() }, tx))
 
-      await Promise.all(promises)
-    })
+        await Promise.all(promises)
+      })
 
-    const exported = await exportDatabaseToBlob()
-    assert.isTrue(exported instanceof Blob)
-  })
+      const exported = await exportDatabaseToBlob()
+      assert.isTrue(exported instanceof Blob)
+    },
+  )
 
   it('should be able to import a single table', async () => {
     class Test extends Model {

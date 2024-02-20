@@ -35,7 +35,7 @@ describe('Fields', () => {
 
       const store = _objectStore('Test')
       assert.isArray(store.keyPath)
-      assert.sameMembers((store.keyPath as string[]), ['id', 'id2'])
+      assert.sameMembers(store.keyPath as string[], ['id', 'id2'])
     })
     it('should set a unique field constraint', async () => {
       class Test extends Model {
@@ -99,7 +99,7 @@ describe('Fields', () => {
       await init('test', 1)
 
       const store = _objectStore('Test')
-      assert.sameMembers((store.keyPath as string[]), ['id', 'test'])
+      assert.sameMembers(store.keyPath as string[], ['id', 'test'])
     })
     it('should allow not creating an index', async () => {
       class Test extends Model {
@@ -165,7 +165,7 @@ describe('Fields', () => {
 
       const store = _objectStore('Test')
       assert.isArray(store.keyPath)
-      assert.sameMembers((store.keyPath as string[]), ['id', 'id2'])
+      assert.sameMembers(store.keyPath as string[], ['id', 'id2'])
     })
     it('should set a unique field constraint', async () => {
       class Test extends Model {
@@ -218,7 +218,7 @@ describe('Fields', () => {
       await init('test', 1)
 
       const store = _objectStore('Test')
-      assert.sameMembers((store.keyPath as string[]), ['id', 'test'])
+      assert.sameMembers(store.keyPath as string[], ['id', 'test'])
     })
     it('should allow not creating an index', async () => {
       class Test extends Model {

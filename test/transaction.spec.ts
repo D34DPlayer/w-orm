@@ -61,7 +61,8 @@ describe('Transactions', () => {
       assert.lengthOf(obtainedTests, 1)
 
       throw new Error('rollback')
-    }).then(() => assert.fail('Should have thrown an error'))
+    })
+      .then(() => assert.fail('Should have thrown an error'))
       .catch((err: Error) => assert.match(err.message, /rollback/))
 
     const obtainedTests = await Test.all()
@@ -82,8 +83,10 @@ describe('Transactions', () => {
     await Transaction('readwrite', [Test], async (tx) => {
       await Test.create({ id: 1 }, tx)
       await wait(100)
-    }).then(
-      () => assert.fail('Should have thrown an error'),
-    ).catch((err: Error) => assert.match(err.message, /callback is still pending/))
+    })
+      .then(() => assert.fail('Should have thrown an error'))
+      .catch((err: Error) =>
+        assert.match(err.message, /callback is still pending/),
+      )
   })
 })
