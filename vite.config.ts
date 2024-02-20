@@ -3,6 +3,7 @@ import { defineConfig } from 'vitest/config'
 
 import dts from 'vite-plugin-dts'
 import { checker } from 'vite-plugin-checker'
+import terser from '@rollup/plugin-terser'
 
 // https://vitejs.dev/guide/build.html#library-mode
 export default defineConfig({
@@ -14,6 +15,9 @@ export default defineConfig({
       fileName: 'index',
     },
     sourcemap: true,
+    rollupOptions: {
+      plugins: [terser()],
+    },
   },
   plugins:
     process.env.VITEST

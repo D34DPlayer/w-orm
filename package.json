@@ -53,6 +53,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^0.37.0",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
+    "@rollup/plugin-terser": "^0.4.4",
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.15.10",
