@@ -1,6 +1,6 @@
 import type { Migration, MigrationList } from './types'
 
-export type MigrationItem = [number, Migration]
+type MigrationItem = [number, Migration]
 
 /**
  * Context passed to migrations.

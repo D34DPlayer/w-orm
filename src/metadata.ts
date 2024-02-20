@@ -85,6 +85,9 @@ export function _handleTableData<T>(instance: T) {
   }
 }
 
+/**
+ * @internal
+ */
 export function _overrideTableData<T>(
   instance: T,
   tableOptions: TableOptions = {},
@@ -267,6 +270,7 @@ export function _compareArrays(a: unknown[], b: unknown[]): boolean {
  * Returns the fields that are indexable for a table.
  * @param tableName - The table's name
  * @returns - The indexable fields
+ * @internal
  */
 export function _getIndexableFields(tableName: string): string[] {
   const tableFields = TablesMetadata[tableName]?.fields
