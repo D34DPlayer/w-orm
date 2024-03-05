@@ -32,8 +32,6 @@ jobs:
     strategy:
       matrix:
         node:
-          # - 14 // Supported but breaks on build, not lts so not worth fixing
-          - 16
           - 18
           - 20
     steps:

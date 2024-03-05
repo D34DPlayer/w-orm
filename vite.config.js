@@ -24,7 +24,7 @@ export default defineConfig({
       ? []
       : [
           dts({
-            outputDir: 'dist/types',
+            outDir: 'dist/types',
           }),
           checker({
             // e.g. use TypeScript check
@@ -41,7 +41,9 @@ export default defineConfig({
     //   name: 'chrome', // browser name is required
     // },
     coverage: {
-      provider: 'istanbul', // or 'c8'
+      provider: 'v8',
+      include: 'src/**/*',
+      all: false,
     },
   },
 })
