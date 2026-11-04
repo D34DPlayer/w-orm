@@ -53,14 +53,14 @@ import {
 export function Field<T>(
   options: Partial<FieldOptions<T>> = {},
 ): PropertyDecorator {
-  return function (object, propertyName) {
-    if (typeof propertyName === 'symbol')
+  return function (target: any, propertyKey: string | symbol) {
+    if (typeof propertyKey === 'symbol')
       throw new WormError('Field decorator doesn\'t support symbols')
 
     // Use "emitDecoratorMetadata" to get the type of the field
     let t: () => T
     try {
-      t = (Reflect.getMetadata('design:type', object, propertyName)
+      t = (Reflect.getMetadata('design:type', target, propertyKey)
         || Object) as () => T
     }
     catch {
@@ -80,8 +80,8 @@ export function Field<T>(
       ...options,
     }
 
-    _handleTableData(object)
-    _addFieldToMetadata(object.constructor.name, propertyName, newOptions)
+    _handleTableData(target)
+    _addFieldToMetadata(target.constructor.name, propertyKey, newOptions)
   }
 }
 

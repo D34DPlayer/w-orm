@@ -1,10 +1,12 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "./tsconfig.build.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true
+  },
   "include": [
     "src/**/*",
     "test/**/*",
-    ".eslintrc.cjs",
-    "rollup.config.mjs",
     "typedoc.config.cjs",
     "vite.config.ts"
   ]

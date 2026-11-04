@@ -22,10 +22,10 @@ export default defineConfig({
       : [
           dts({
             outputDir: 'dist/types',
+            tsConfigFilePath: 'tsconfig.build.json',
           }),
           checker({
-            // e.g. use TypeScript check
-            typescript: true,
+            typescript: { tsconfigPath: 'tsconfig.build.json' },
             eslint: {
               lintCommand: 'eslint .',
             },

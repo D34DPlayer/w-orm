@@ -52,7 +52,7 @@ export abstract class Model implements Record<string, any> {
    * @returns - The new model instance
    */
   public static async create<T extends Model>(
-    this: { new (): T },
+    this: new () => T,
     values: Partial<T>,
     tx?: IDBTransaction,
   ): Promise<T> {
@@ -99,7 +99,7 @@ export abstract class Model implements Record<string, any> {
    * @returns - The model instance or null if not found
    */
   public static async get<T extends Model>(
-    this: { new (): T },
+    this: new () => T,
     key: IDBValidKey,
     tx?: IDBTransaction,
   ): Promise<T | null> {
@@ -129,7 +129,7 @@ export abstract class Model implements Record<string, any> {
    * @returns - The model instances
    */
   public static async all<T extends Model>(
-    this: { new (): T },
+    this: new () => T,
     tx?: IDBTransaction,
   ): Promise<T[]> {
     return new Query(this).all(tx)
@@ -153,7 +153,7 @@ export abstract class Model implements Record<string, any> {
    * ```
    */
   public static async forEach<T extends Model>(
-    this: { new (): T },
+    this: new () => T,
     callback: ForEachCallback<T>,
     tx?: IDBTransaction,
   ): Promise<void> {
@@ -165,7 +165,7 @@ export abstract class Model implements Record<string, any> {
    * @returns - The number of model instances
    */
   public static async count<T extends Model>(
-    this: { new (): T },
+    this: new () => T,
     tx?: IDBTransaction,
   ): Promise<number> {
     return new Promise<number>((resolve, reject) => {
@@ -188,7 +188,7 @@ export abstract class Model implements Record<string, any> {
    * @returns - The new query
    */
   public static filter<T extends Model>(
-    this: { new (): T },
+    this: new () => T,
     filters: Filter<T>,
   ): Query<T> {
     return new Query(this).filter(filters)
@@ -202,7 +202,7 @@ export abstract class Model implements Record<string, any> {
    * @returns - The new query
    */
   public static orderBy<T extends Model>(
-    this: { new (): T },
+    this: new () => T,
     orderBy: OrderBy<T>,
   ): Query<T> {
     return new Query(this).orderBy(orderBy)
@@ -217,7 +217,7 @@ export abstract class Model implements Record<string, any> {
    * @returns - The new query
    */
   public static withIndex<T extends Model>(
-    this: { new (): T },
+    this: new () => T,
     index: string,
     query: BetweenFilter<unknown>,
   ): Query<T> {

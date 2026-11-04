@@ -1,26 +1,7 @@
 {
-  "compilerOptions": {
-    "target": "ES2017",
-    "lib": [
-      "ES2020",
-      "DOM"
-    ],
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "rootDir": "./src",
-    "module": "CommonJS",
-    "types": [
-      "reflect-metadata",
-      "node",
-      "mocha"
-    ],
-    "strict": true,
-    "outDir": "./dist/lib",
-    "sourceMap": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true
-  },
-  "include": [
-    "src/**/*"
-  ]
+  "references": [
+    { "path": "./tsconfig.build.json" },
+    { "path": "./tsconfig.extended.json" }
+  ],
+  "files": []
 }
