@@ -1,8 +1,9 @@
 import { resolve } from 'node:path'
-import { defineConfig } from 'vitest/config'
+import process from 'node:process'
+import { checker } from 'vite-plugin-checker'
 
 import dts from 'vite-plugin-dts'
-import { checker } from 'vite-plugin-checker'
+import { defineConfig } from 'vitest/config'
 
 // https://vitejs.dev/guide/build.html#library-mode
 export default defineConfig({

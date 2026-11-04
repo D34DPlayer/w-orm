@@ -2,10 +2,10 @@ import { assert, describe, it } from 'vitest'
 
 import { init } from '../src/connection'
 import { Field } from '../src/fields'
-import { Model } from '../src/models'
 import { getPrimaryKeys } from '../src/metadata'
+import { Model } from '../src/models'
 
-describe('Metadata', () => {
+describe('metadata', () => {
   describe('getPrimaryKeys', () => {
     it('should return an empty array if the table does not exist', () => {
       const primaryKeys = getPrimaryKeys('doesNotExist')

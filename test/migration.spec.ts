@@ -1,13 +1,13 @@
-import { assert, describe, it } from 'vitest'
-
-import { db, disconnect, init } from '../src/connection'
-import { Field, defineModel } from '../src/fields'
-import { LenientModel, Model } from '../src/models'
-import { _resetMetadata } from '../src/metadata'
 import type { MigrationList } from '../src/types'
+
+import { assert, describe, it } from 'vitest'
+import { db, disconnect, init } from '../src/connection'
+import { defineModel, Field } from '../src/fields'
+import { _resetMetadata } from '../src/metadata'
+import { LenientModel, Model } from '../src/models'
 import { _objectStore } from '../src/transaction'
 
-describe('Migration system', () => {
+describe('migration system', () => {
   it('should be able to add a new field', async () => {
     // #region First version
     class Test1 extends Model {

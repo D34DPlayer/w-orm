@@ -19,7 +19,7 @@ export const db: DB = {
  * @param version - Database version
  * @internal
  */
-function _updateDB(_db: IDBDatabase, dbName: string, version: number) {
+function _updateDB(_db: IDBDatabase, dbName: string, version: number): void {
   Object.assign(db, {
     session: _db,
     connected: true,

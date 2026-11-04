@@ -20,8 +20,8 @@
   "sideEffects": false,
   "exports": {
     ".": {
-      "require": "./dist/index.umd.js",
-      "import": "./dist/index.mjs"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.umd.js"
     }
   },
   "main": "dist/index.umd.js",
@@ -52,16 +52,16 @@
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.37.0",
+    "@antfu/eslint-config": "^10.0.0",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",
-    "@types/node": "^18.15.10",
+    "@types/node": "^22.13.14",
     "@typescript/lib-dom": "npm:@types/web@^0.0.99",
     "@vitest/coverage-istanbul": "^0.31.1",
     "@vitest/ui": "^0.31.1",
     "chai": "^4.3.7",
-    "eslint": "^8.36.0",
+    "eslint": "^10.14.0",
     "fake-indexeddb": "^4.0.1",
     "lint-staged": "^13.2.0",
     "mocha": "^10.2.0",

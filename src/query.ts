@@ -1,3 +1,4 @@
+import type { Model } from './models'
 import type {
   CursorCallback,
   Filter,
@@ -8,10 +9,9 @@ import type {
   SimpleFilter,
   TransactionOrMode,
 } from './types'
-import type { Model } from './models'
-import { _objectStore } from './transaction'
 import { WormError } from './errors'
 import { _getIndexableFields } from './metadata'
+import { _objectStore } from './transaction'
 
 export class BetweenFilter<T> {
   /** The minimum key for IDB */
@@ -273,7 +273,7 @@ export class Query<T extends Model> {
    * up to you to benchmark which one is faster.
    * @param index - The index to use
    * @param query - The query to use on the index
-   * @returns
+   * @returns - The query itself, to allow chaining
    */
   public withIndex(
     index: ModelFieldKey<T> | string,
@@ -306,7 +306,6 @@ export class Query<T extends Model> {
     for (const [key, value] of Object.entries(this.filters)) {
       if (typeof value === 'function') {
         // If the value is a function, we call it with the instance's value
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         if (!value(instance[key as keyof T]))
           return false
         continue
@@ -343,7 +342,7 @@ export class Query<T extends Model> {
    * Utility function to get the cursor of the query.
    * If the query has an order, it will use the index of the order.
    * Otherwise, if the query has a simple filter, it will use the index of the filter + add a query.
-   * @returns
+   * @returns - The cursor request for the query
    */
   private _getCursor(
     txOrMode: TransactionOrMode = 'readonly',

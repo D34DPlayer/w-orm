@@ -1,12 +1,12 @@
 import { assert, describe, it } from 'vitest'
 
 import { db, init } from '../src/connection'
+import { defineModel, Field, Table } from '../src/fields'
 import { Model } from '../src/models'
-import { Field, Table, defineModel } from '../src/fields'
 import { _objectStore } from '../src/transaction'
 
-describe('Fields', () => {
-  describe('Field options', () => {
+describe('fields', () => {
+  describe('field options', () => {
     it('should be able to set a field as primary key', async () => {
       class Test extends Model {
         @Field({ primaryKey: true })
@@ -84,7 +84,10 @@ describe('Fields', () => {
     // Default is tested within model creation
     it('should support inheritance', async () => {
       abstract class BaseModel extends Model {
-        @Field({ primaryKey: true, default: () => Date.now() })
+        @Field({
+          primaryKey: true,
+          default: () => Date.now(),
+        })
         id!: number
 
         @Field({ default: 1 })
@@ -133,7 +136,7 @@ describe('Fields', () => {
       assert.equal(test.test, 'test')
     })
   })
-  describe('Define table helper', () => {
+  describe('define table helper', () => {
     it('should be able to set a field as primary key', async () => {
       class Test extends Model {
         id!: number
@@ -204,7 +207,10 @@ describe('Fields', () => {
         version!: number
       }
       defineModel(BaseModel, {
-        id: { primaryKey: true, default: () => Date.now() },
+        id: {
+          primaryKey: true,
+          default: () => Date.now(),
+        },
         version: { default: 1 },
       })
 
@@ -238,7 +244,7 @@ describe('Fields', () => {
       assert(!store.indexNames.contains('test'))
     })
   })
-  describe('Table decorator', () => {
+  describe('table decorator', () => {
     it('allows overriding the table name', async () => {
       @Table({ name: 'tableName' })
       class Test extends Model {

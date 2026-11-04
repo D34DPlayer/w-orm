@@ -1,10 +1,10 @@
 import { assert, describe, it } from 'vitest'
 
-import { Transaction, _objectStore } from '../src/transaction'
-import { Model } from '../src/models'
 import { Field } from '../src/fields'
+import { Model } from '../src/models'
+import { _objectStore, Transaction } from '../src/transaction'
 
-describe('Connection Errors', () => {
+describe('connection Errors', () => {
   it('should fail at _objectStore', async () => {
     assert.throws(() => {
       _objectStore('notFound', 'readwrite')

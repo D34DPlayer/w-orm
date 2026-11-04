@@ -1,12 +1,12 @@
 import { assert, describe, it } from 'vitest'
 
 import { init } from '../src/connection'
-import { Model } from '../src/models'
-import { Field, Table } from '../src/fields'
-import { Between, Query } from '../src/query'
 import { WormError } from '../src/errors'
+import { Field, Table } from '../src/fields'
+import { Model } from '../src/models'
+import { Between, Query } from '../src/query'
 
-describe('Query builder', () => {
+describe('query builder', () => {
   describe('filter', () => {
     it('should return all when no filters are applied', async () => {
       class Test extends Model {
@@ -285,7 +285,9 @@ describe('Query builder', () => {
       await Test.create({ id: 3, name: 'test3', age: 30 })
       await Test.create({ id: 4, name: 'test4', age: 10 })
 
-      const obtainedTests = await Test.filter({ age: t => t < 25 })
+      const obtainedTests = await Test.filter({
+        age: t => t < 25,
+      })
         .orderBy('id')
         .limit(2)
         .all()
@@ -310,7 +312,9 @@ describe('Query builder', () => {
       await Test.create({ id: 3, name: 'test3', age: 30 })
       const test4 = await Test.create({ id: 4, name: 'test4', age: 10 })
 
-      const obtainedTests = await Test.filter({ age: t => t < 25 })
+      const obtainedTests = await Test.filter({
+        age: t => t < 25,
+      })
         .orderBy('id')
         .offset(1)
         .all()
@@ -360,7 +364,9 @@ describe('Query builder', () => {
       const test3 = await Test.create({ id: 3, name: 'test3', age: 30 })
       await Test.create({ id: 4, name: 'test4', age: 10 })
 
-      await Test.filter({ age: t => t < 25 }).delete()
+      await Test.filter({
+        age: t => t < 25,
+      }).delete()
 
       const obtainedTests = await Test.all()
       assert.sameDeepMembers(obtainedTests, [test3])
@@ -383,7 +389,9 @@ describe('Query builder', () => {
       await Test.create({ id: 2, name: 'test1', age: 20 })
       await Test.create({ id: 3, name: 'test1', age: 30 })
 
-      await Test.filter({ age: t => t < 25 }).update({ name: 'test2' })
+      await Test.filter({
+        age: t => t < 25,
+      }).update({ name: 'test2' })
 
       await Test.filter({ name: 'test1' }).delete()
 
@@ -411,7 +419,9 @@ describe('Query builder', () => {
       await Test.create({ id: 3, name: 'test1', age: 30 })
 
       const results = [] as number[]
-      await Test.filter({ age: t => t < 25 })
+      await Test.filter({
+        age: t => t < 25,
+      })
         .orderBy('-age')
         .forEach(async (instance) => {
           results.push(instance.age)
@@ -437,7 +447,9 @@ describe('Query builder', () => {
       await Test.create({ id: 2, name: 'test1', age: 20 })
       await Test.create({ id: 3, name: 'test1', age: 30 })
 
-      await Test.filter({ age: t => t < 25 })
+      await Test.filter({
+        age: t => t < 25,
+      })
         .orderBy('-age')
         .forEach(async (t, tx) => {
           t.update({ name: 'test2' })
@@ -526,7 +538,9 @@ describe('Query builder', () => {
       const test3 = await Test.create({ id: 3, name: 'test3' })
       const test4 = await Test.create({ id: 4, name: 'test4' })
 
-      let obtainedTests = await Test.filter({ id: Between(1, 2) }).all()
+      let obtainedTests = await Test.filter({
+        id: Between(1, 2),
+      }).all()
       assert.sameDeepMembers(obtainedTests, [test1, test2])
 
       obtainedTests = await Test.filter({
@@ -565,27 +579,37 @@ describe('Query builder', () => {
       const test3 = await Test.create({ id: 3, name: 'test3' })
       const test4 = await Test.create({ id: 4, name: 'test4' })
 
-      let obtainedTests = await Test.filter({ id: Between(1, 2) })
+      let obtainedTests = await Test.filter({
+        id: Between(1, 2),
+      })
         .orderBy('name')
         .all()
       assert.sameDeepMembers(obtainedTests, [test1, test2])
 
-      obtainedTests = await Test.filter({ id: Between(2, 3, true, false) })
+      obtainedTests = await Test.filter({
+        id: Between(2, 3, true, false),
+      })
         .orderBy('name')
         .all()
       assert.sameDeepMembers(obtainedTests, [test3])
 
-      obtainedTests = await Test.filter({ id: Between(3, 4, true, true) })
+      obtainedTests = await Test.filter({
+        id: Between(3, 4, true, true),
+      })
         .orderBy('name')
         .all()
       assert.lengthOf(obtainedTests, 0)
 
-      obtainedTests = await Test.filter({ id: Between(1, null, true, false) })
+      obtainedTests = await Test.filter({
+        id: Between(1, null, true, false),
+      })
         .orderBy('name')
         .all()
       assert.sameDeepMembers(obtainedTests, [test2, test3, test4])
 
-      obtainedTests = await Test.filter({ id: Between(null, 3, false, true) })
+      obtainedTests = await Test.filter({
+        id: Between(null, 3, false, true),
+      })
         .orderBy('name')
         .all()
       assert.sameDeepMembers(obtainedTests, [test1, test2])
@@ -721,9 +745,18 @@ describe('Query builder', () => {
 
       await init('test', 1)
 
-      const test1 = await Test.create({ id: 1, tags: ['a', 'b', 'c'] })
-      const test2 = await Test.create({ id: 2, tags: ['a', 'b', 'd'] })
-      const test3 = await Test.create({ id: 3, tags: ['a', 'b', 'c'] })
+      const test1 = await Test.create({
+        id: 1,
+        tags: ['a', 'b', 'c'],
+      })
+      const test2 = await Test.create({
+        id: 2,
+        tags: ['a', 'b', 'd'],
+      })
+      const test3 = await Test.create({
+        id: 3,
+        tags: ['a', 'b', 'c'],
+      })
 
       const obtainedTests = await Test.withIndex(
         'tagsMI',

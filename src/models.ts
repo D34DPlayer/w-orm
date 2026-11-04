@@ -1,9 +1,9 @@
-import type { Filter, ForEachCallback, OrderBy } from './types'
-import { TablesMetadata, getPrimaryKeys } from './metadata'
-import { _objectStore } from './transaction'
 import type { BetweenFilter } from './query'
-import { Query } from './query'
+import type { Filter, ForEachCallback, OrderBy } from './types'
 import { ModelError } from './errors'
+import { getPrimaryKeys, TablesMetadata } from './metadata'
+import { Query } from './query'
+import { _objectStore } from './transaction'
 
 /**
  * Base class for all models.
@@ -69,7 +69,7 @@ export abstract class Model implements Record<string, any> {
         // Check if field has a default value
         if (fieldOpts.default !== undefined && fieldOpts.default !== null) {
           // Check if default value is a generator
-          if (fieldOpts.default instanceof Function)
+          if (typeof fieldOpts.default === 'function')
             instance[field as keyof T] = fieldOpts.default() as T[keyof T]
           else instance[field as keyof T] = fieldOpts.default as T[keyof T]
         }
@@ -105,7 +105,9 @@ export abstract class Model implements Record<string, any> {
   ): Promise<T | null> {
     const store = _objectStore(this.name, tx)
     return new Promise((resolve, reject) => {
-      const request = store.get(Array.isArray(key) ? key : [key])
+      const request = store.get(Array.isArray(key)
+        ? key
+        : [key])
       request.onerror = (_) => {
         reject(request.error)
       }
