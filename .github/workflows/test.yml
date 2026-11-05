@@ -30,9 +30,7 @@ jobs:
     strategy:
       matrix:
         node:
-          # - 14 // Breaks on build
-          # - 16 // Fails due to the pnpm version
-          - 18
+          # - 18 // Breaks on build
           - 20
           - 22
           - 24
