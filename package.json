@@ -1,7 +1,7 @@
 {
   "name": "@d34d/w-orm",
   "type": "module",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "packageManager": "pnpm@12.17.0",
   "description": "IndexedDB ORM",
   "author": {
