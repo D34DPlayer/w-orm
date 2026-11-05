@@ -54,13 +54,13 @@ importers:
         specifier: ^14.2.6
         version: 14.2.6
       simple-git-hooks:
-        specifier: ^2.14.0
+        specifier: ^2.14
         version: 2.14.0
       ts-node:
-        specifier: ^10.9.2
+        specifier: ^10.9
         version: 10.9.2(@types/node@26.6.6)(typescript@6.0.3)
       tslib:
-        specifier: ^2.9.1
+        specifier: ^2.9
         version: 2.9.1
       typedoc:
         specifier: ^0.28.20
@@ -75,7 +75,7 @@ importers:
         specifier: ^1.1.2
         version: 1.1.2(@microsoft/api-extractor@7.60.1(@types/node@26.6.6))(esbuild@0.28.2)(rolldown@1.2.16)(rollup@4.67.5)(typescript@6.0.3)(vite@8.3.6(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.17.5)(yaml@2.9.1))
       vite:
-        specifier: ^8.3.6
+        specifier: ^8.3
         version: 8.3.6(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.17.5)(yaml@2.9.1)
       vite-plugin-checker:
         specifier: ^0.14.5
