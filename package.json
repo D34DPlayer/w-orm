@@ -1,5 +1,6 @@
 {
   "name": "@d34d/w-orm",
+  "type": "module",
   "version": "0.5.0",
   "packageManager": "pnpm@10.33.3",
   "description": "IndexedDB ORM",
@@ -20,12 +21,12 @@
   "sideEffects": false,
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.umd.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.umd.cjs"
     }
   },
-  "main": "dist/index.umd.js",
-  "module": "dist/index.mjs",
+  "main": "dist/index.umd.cjs",
+  "module": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "files": [
     "dist/**/*"
@@ -36,8 +37,10 @@
     "prebuild": "rimraf dist",
     "build:lib": "tsc -p tsconfig.build.json --module commonjs",
     "build:dist": "vite build",
-    "build:docs": "typedoc",
+    "build:docs": "typedoc ./src/index.ts ./src/types.ts ./src/errors.ts",
     "build": "pnpm build:dist && pnpm build:lib",
+    "serve:docs": "serve docs",
+    "serve:coverage": "serve coverage",
     "start": "vite",
     "prepare": "pnpm build",
     "prepublishOnly": "pnpm lint",
@@ -53,33 +56,31 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^10.0.0",
-    "@istanbuljs/nyc-config-typescript": "^1.0.2",
-    "@types/node": "^22.13.14",
-    "@typescript/lib-dom": "npm:@types/web@^0.0.99",
-    "@vitest/coverage-istanbul": "^0.31.1",
-    "@vitest/ui": "^0.31.1",
+    "@microsoft/api-extractor": "^7.60.1",
+    "@shipgirl/typedoc-plugin-versions": "^0.3.3",
+    "@types/node": "^26.6.6",
+    "@typescript/lib-dom": "npm:@types/web@^0.0.360",
+    "@vitest/coverage-v8": "^5.1.0",
+    "@vitest/ui": "^5.1.0",
     "chai": "^6.3.0",
     "eslint": "^10.14.0",
-    "fake-indexeddb": "^4.0.1",
-    "lint-staged": "^13.2.0",
+    "fake-indexeddb": "^6.2.7",
+    "lint-staged": "^17.6.0",
     "mocha": "^12.0.3",
-    "nyc": "^15.1.0",
-    "reflect-metadata": "^0.1.13",
-    "rimraf": "^4.4.1",
-    "serve": "^14.2.0",
-    "shelljs": "^0.8.5",
+    "reflect-metadata": "^0.2.2",
+    "rimraf": "^6.1.4",
+    "serve": "^14.2.6",
     "simple-git-hooks": "^2.8.1",
-    "terser": "^5.17.5",
     "ts-node": "^10.9.1",
     "tslib": "^2.5.0",
-    "typedoc": "^0.23.28",
-    "typedoc-theme-yaf": "^0.0.4",
-    "typescript": "~5.x",
-    "vite": "^4.3.8",
-    "vite-plugin-checker": "^0.6.0",
-    "vite-plugin-dts": "^2.3.0",
-    "vitest": "^0.31.1",
-    "webdriverio": "^8.10.5"
+    "typedoc": "^0.28.20",
+    "typedoc-rhineai-theme": "^1.2.0",
+    "typescript": "~6.x",
+    "unplugin-dts": "^1.1.2",
+    "vite": "^8.3.5",
+    "vite-plugin-checker": "^0.14.5",
+    "vitest": "^5.1.0",
+    "webdriverio": "^10.1.0"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged"

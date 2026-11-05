@@ -1,7 +1,8 @@
-import type { MigrationContext } from './migration'
 /**
  * @module Types
  */
+
+import type { MigrationContext } from './migration'
 import type { Model } from './models'
 import type { BetweenFilter } from './query'
 

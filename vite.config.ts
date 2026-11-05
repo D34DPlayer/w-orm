@@ -1,16 +1,17 @@
+/// <reference types="vitest/config" />
 import { resolve } from 'node:path'
 import process from 'node:process'
-import { checker } from 'vite-plugin-checker'
+import dts from 'unplugin-dts/vite'
 
-import dts from 'vite-plugin-dts'
+import { checker } from 'vite-plugin-checker'
 import { defineConfig } from 'vitest/config'
 
 // https://vitejs.dev/guide/build.html#library-mode
 export default defineConfig({
   build: {
     lib: {
+      entry: resolve(import.meta.dirname, 'src/index.ts'),
       formats: ['es', 'umd'],
-      entry: resolve(__dirname, 'src/index.ts'),
       name: 'WORM',
       fileName: 'index',
     },
@@ -21,8 +22,13 @@ export default defineConfig({
       ? []
       : [
           dts({
-            outputDir: 'dist/types',
-            tsConfigFilePath: 'tsconfig.build.json',
+            outDirs: [
+              'dist',
+              { dir: 'dist', moduleFormat: 'esm' },
+              { dir: 'dist', moduleFormat: 'cjs' },
+            ],
+            bundleTypes: true,
+            tsconfigPath: 'tsconfig.build.json',
           }),
           checker({
             typescript: { tsconfigPath: 'tsconfig.build.json' },
@@ -38,7 +44,7 @@ export default defineConfig({
     //   name: 'chrome', // browser name is required
     // },
     coverage: {
-      provider: 'istanbul', // or 'c8'
+      provider: 'v8',
     },
   },
 })

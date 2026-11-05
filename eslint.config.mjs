@@ -4,7 +4,13 @@ import antfu from '@antfu/eslint-config'
 
 export default antfu({
   type: 'lib',
-  ignores: ['dist', 'node_modules', 'docs', '*.md'],
+  ignores: [
+    'dist',
+    'node_modules',
+    'docs',
+    '*.md',
+    'gh-pages',
+  ],
 }, {
   files: ['src/**/*.ts', 'test/**/*.ts'],
   rules: {

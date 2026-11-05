@@ -2,12 +2,13 @@
   "extends": "./tsconfig.build.json",
   "compilerOptions": {
     "rootDir": ".",
+    "module": "esnext",
     "noEmit": true
   },
   "include": [
     "src/**/*",
     "test/**/*",
-    "typedoc.config.cjs",
+    "typedoc.config.mjs",
     "vite.config.ts"
   ]
 }

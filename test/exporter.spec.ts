@@ -18,7 +18,7 @@ function getNodeVersion(): number {
   return parseInt(process.version.split('.')[0].slice(1))
 }
 
-describe('dB Exporter', () => {
+describe('database exporter', () => {
   it('fails when no connection has been established', async () => {
     class Test extends Model {
       @Field({ primaryKey: true })

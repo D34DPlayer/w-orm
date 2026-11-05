@@ -13,8 +13,9 @@ import { _objectStore } from './transaction'
  * @see {@link Query} for more information about querying the database
  *
  * @example
- * Create a new model:
  * ```ts
+ * // Create a new model:
+ * 
  * import { Model, Field } from '@d34d/w-orm'
  *
  * class NewTable extends Model {
@@ -23,9 +24,9 @@ import { _objectStore } from './transaction'
  *  @Field()
  *  name: string
  * }
- * ```
- * Query the database:
- * ```ts
+ *
+ * // Query the database:
+ * 
  * // Get with primary key
  * const table = await NewTable.get(1)
  * // Get all
