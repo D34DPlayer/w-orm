@@ -15,7 +15,7 @@ import { _objectStore } from './transaction'
  * @example
  * ```ts
  * // Create a new model:
- * 
+ *
  * import { Model, Field } from '@d34d/w-orm'
  *
  * class NewTable extends Model {
@@ -26,7 +26,7 @@ import { _objectStore } from './transaction'
  * }
  *
  * // Query the database:
- * 
+ *
  * // Get with primary key
  * const table = await NewTable.get(1)
  * // Get all

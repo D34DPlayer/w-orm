@@ -20,7 +20,7 @@ const author = pkg.author?.url
 const config = {
   entryPoints: ['./src/index.ts', './src/types.ts', './src/errors.ts'],
   out: 'docs',
-  
+
   navigationLinks: {
     'Source code': repository,
   },
