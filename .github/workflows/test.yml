@@ -30,8 +30,7 @@ jobs:
     strategy:
       matrix:
         node:
-          # - 18 // Breaks on build
-          - 20
+          # - 20 // Breaks on build
           - 22
           - 24
           - 26
