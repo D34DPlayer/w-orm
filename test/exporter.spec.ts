@@ -1,9 +1,7 @@
 import { assert, describe, it } from 'vitest'
 
-import { Model } from '../src/models'
 import { init } from '../src/connection'
-import { Field } from '../src/fields'
-import { Transaction } from '../src/transaction'
+import { ConnectionError } from '../src/errors'
 import {
   exportDatabase,
   exportDatabaseToBlob,
@@ -11,14 +9,16 @@ import {
   importDatabase,
   importTable,
 } from '../src/exporter'
-import { ConnectionError } from '../src/errors'
+import { Field } from '../src/fields'
+import { Model } from '../src/models'
+import { Transaction } from '../src/transaction'
 
 function getNodeVersion(): number {
   // eg. v16.18.1
   return parseInt(process.version.split('.')[0].slice(1))
 }
 
-describe('DB Exporter', () => {
+describe('database exporter', () => {
   it('fails when no connection has been established', async () => {
     class Test extends Model {
       @Field({ primaryKey: true })
@@ -56,8 +56,14 @@ describe('DB Exporter', () => {
 
     await init('test', 1)
 
-    const test = await Test.create({ id: 1, tags: ['a', 'b'] })
-    const test2 = await Test.create({ id: 2, tags: ['c', 'd'] })
+    const test = await Test.create({
+      id: 1,
+      tags: ['a', 'b'],
+    })
+    const test2 = await Test.create({
+      id: 2,
+      tags: ['c', 'd'],
+    })
 
     const exported = await exportTable(Test.name)
     assert.deepEqual(exported, [test, test2])
@@ -80,8 +86,14 @@ describe('DB Exporter', () => {
 
     await init('test', 1)
 
-    const test = await Test.create({ id: 1, tags: ['a', 'b'] })
-    const test2 = await Test.create({ id: 2, tags: ['c', 'd'] })
+    const test = await Test.create({
+      id: 1,
+      tags: ['a', 'b'],
+    })
+    const test2 = await Test.create({
+      id: 2,
+      tags: ['c', 'd'],
+    })
     const test3 = await Test2.create({ id: 1, username: 'test' })
     const test4 = await Test2.create({ id: 2, username: 'test2' })
 
@@ -105,8 +117,12 @@ describe('DB Exporter', () => {
       await init('test', 1)
       await Transaction('readwrite', [Test], async (tx) => {
         const promises: Promise<Test>[] = []
-        for (let i = 0; i < 10000; i++)
-          promises.push(Test.create({ id: i, random: Math.random() }, tx))
+        for (let i = 0; i < 10000; i++) {
+          promises.push(Test.create({
+            id: i,
+            random: Math.random(),
+          }, tx))
+        }
 
         await Promise.all(promises)
       })
@@ -127,8 +143,14 @@ describe('DB Exporter', () => {
     await init('test', 1)
 
     const data = [
-      { id: 1, tags: ['a', 'b'] },
-      { id: 2, tags: ['c', 'd'] },
+      {
+        id: 1,
+        tags: ['a', 'b'],
+      },
+      {
+        id: 2,
+        tags: ['c', 'd'],
+      },
     ]
 
     await importTable(Test.name, data)
@@ -157,8 +179,14 @@ describe('DB Exporter', () => {
 
     const data = {
       Test: [
-        { id: 1, tags: ['a', 'b'] },
-        { id: 2, tags: ['c', 'd'] },
+        {
+          id: 1,
+          tags: ['a', 'b'],
+        },
+        {
+          id: 2,
+          tags: ['c', 'd'],
+        },
       ],
       Test2: [
         { id: 1, username: 'test' },

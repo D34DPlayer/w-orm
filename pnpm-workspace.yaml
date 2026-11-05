@@ -1,0 +1,19 @@
+minimumReleaseAgeExcludePrune: true
+minimumReleaseAgeExclude:
+  - '@pnpm/exe@11.28.11'
+  - '@pnpm/linux-arm64@11.28.11'
+  - '@pnpm/linux-x64@11.28.11'
+  - '@pnpm/linuxstatic-x64@11.28.11'
+  - '@pnpm/macos-arm64@11.28.11'
+  - '@pnpm/win-arm64@11.28.11'
+  - '@pnpm/win-x64@11.28.11'
+
+trustPolicy: no-downgrade
+
+update:
+  githubActions: true
+
+shellEmulator: true
+
+allowBuilds:
+  simple-git-hooks: true

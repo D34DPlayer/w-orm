@@ -1,11 +1,14 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "./tsconfig.build.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "module": "esnext",
+    "noEmit": true
+  },
   "include": [
     "src/**/*",
     "test/**/*",
-    ".eslintrc.cjs",
-    "rollup.config.mjs",
-    "typedoc.config.cjs",
+    "typedoc.config.mjs",
     "vite.config.ts"
   ]
 }

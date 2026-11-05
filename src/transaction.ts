@@ -1,3 +1,4 @@
+import type { Model } from './models'
 import type {
   Constructor,
   TransactionCallback,
@@ -5,7 +6,6 @@ import type {
 } from './types'
 import { db } from './connection'
 import { ConnectionError, WormError } from './errors'
-import type { Model } from './models'
 import { TablesMetadata } from './metadata'
 
 export function _objectStore(
@@ -24,7 +24,7 @@ export function _objectStore(
 /**
  * Utility function to get an object store from the global database connection
  * @param storeName The name of the object store
- * @param mode The transaction mode
+ * @param txOrMode An existing transaction or the transaction mode
  * @returns { IDBObjectStore } - The object store
  * @internal
  */

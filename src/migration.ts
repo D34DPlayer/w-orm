@@ -33,7 +33,7 @@ export class MigrationContext {
    * @param oldVersion - The old version
    * @param newVersion - The new version
    */
-  public async runMigrations(oldVersion: number, newVersion: number | null) {
+  public async runMigrations(oldVersion: number, newVersion: number | null): Promise<void> {
     // If the database is deleted, newVersion is null
     if (newVersion === null)
       return
@@ -55,7 +55,7 @@ export class MigrationContext {
    * Deletes a table from the database.
    * @param name - The table's name
    */
-  public deleteTable(name: string) {
+  public deleteTable(name: string): void {
     this.db.deleteObjectStore(name)
   }
 }

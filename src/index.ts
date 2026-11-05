@@ -3,10 +3,10 @@
  */
 
 export * from './connection'
+export * from './exporter'
 export * from './fields'
 export * from './metadata'
 export * from './migration'
 export * from './models'
 export * from './query'
 export * from './transaction'
-export * from './exporter'

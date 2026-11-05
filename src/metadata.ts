@@ -1,3 +1,4 @@
+import type { Model } from './models'
 import type {
   FieldOptions,
   Index,
@@ -5,7 +6,6 @@ import type {
   TableMetadata,
   TableOptions,
 } from './types'
-import type { Model } from './models'
 import { ModelError, WormError } from './errors'
 
 /**
@@ -30,7 +30,7 @@ export function _addFieldToMetadata<T>(
   tableName: string,
   fieldName: string,
   options: FieldOptions<T>,
-) {
+): void {
   if (!TablesMetadata[tableName])
     throw new WormError(`Table ${tableName} is not defined`)
   TablesMetadata[tableName].fields[fieldName] = options
@@ -40,7 +40,7 @@ export function _addFieldToMetadata<T>(
  * Helper function to reset the metadata.
  * @internal
  */
-export function _resetMetadata() {
+export function _resetMetadata(): void {
   for (const tableName in TablesMetadata) delete TablesMetadata[tableName]
 }
 
@@ -49,7 +49,7 @@ export function _resetMetadata() {
  * @param instance - The decorator's target
  * @internal
  */
-export function _handleTableData<T>(instance: T) {
+export function _handleTableData<T>(instance: T): void {
   if (!instance)
     return
 
@@ -88,7 +88,7 @@ export function _handleTableData<T>(instance: T) {
 export function _overrideTableData<T>(
   instance: T,
   tableOptions: TableOptions = {},
-) {
+): void {
   if (!instance)
     return
 
@@ -142,8 +142,9 @@ export function createTables(session: IDBDatabase, tx: IDBTransaction): void {
     if (
       metadata.abstract
       || (metadata.abstract === undefined && metadata.hasChild)
-    )
+    ) {
       continue
+    }
 
     const tableName = metadata.tableName
     const tableFields = metadata.fields
@@ -212,7 +213,7 @@ function _createIndex(
   store: IDBObjectStore,
   newIndex: string,
   indexDef: Index,
-) {
+): void {
   if (oldIndexes.has(newIndex)) {
     const oldIndex = store.index(newIndex)
     if (!_compareIndex(oldIndex, indexDef))
@@ -221,7 +222,9 @@ function _createIndex(
   }
 
   const keyPath
-    = indexDef.fields.length > 1 ? indexDef.fields : indexDef.fields[0]
+    = indexDef.fields.length > 1
+      ? indexDef.fields
+      : indexDef.fields[0]
 
   store.createIndex(newIndex, keyPath, {
     unique: indexDef.unique,

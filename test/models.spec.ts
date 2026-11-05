@@ -1,11 +1,11 @@
 import { assert, describe, it } from 'vitest'
 
-import { Model } from '../src/models'
 import { init } from '../src/connection'
 import { Field } from '../src/fields'
+import { Model } from '../src/models'
 import { _objectStore } from '../src/transaction'
 
-describe('Models', () => {
+describe('models', () => {
   describe('create', () => {
     it('should create a new instance of a model', async () => {
       class Test extends Model {
@@ -21,7 +21,9 @@ describe('Models', () => {
         const store = _objectStore('Test')
         const itemsReq = store.getAll()
         itemsReq.onsuccess = () => {
-          assert.deepEqual(itemsReq.result, [{ id: 1 }])
+          assert.deepEqual(itemsReq.result, [
+            { id: 1 },
+          ])
           resolve(itemsReq.result)
         }
         itemsReq.onerror = () => {
@@ -86,7 +88,9 @@ describe('Models', () => {
         const store = _objectStore('Test')
         const itemsReq = store.getAll()
         itemsReq.onsuccess = () => {
-          assert.deepEqual(itemsReq.result, [{ id: 1, test: 'test' }])
+          assert.deepEqual(itemsReq.result, [
+            { id: 1, test: 'test' },
+          ])
           resolve(itemsReq.result)
         }
         itemsReq.onerror = () => {
@@ -100,7 +104,9 @@ describe('Models', () => {
         @Field({ primaryKey: true })
         id!: number
 
-        @Field({ default: () => 'test' })
+        @Field({
+          default: () => 'test',
+        })
         test!: string
       }
 
@@ -112,7 +118,9 @@ describe('Models', () => {
         const store = _objectStore('Test')
         const itemsReq = store.getAll()
         itemsReq.onsuccess = () => {
-          assert.deepEqual(itemsReq.result, [{ id: 1, test: 'test' }])
+          assert.deepEqual(itemsReq.result, [
+            { id: 1, test: 'test' },
+          ])
           resolve(itemsReq.result)
         }
         itemsReq.onerror = () => {
@@ -271,7 +279,11 @@ describe('Models', () => {
 
       const obtainedKeys = await Test.keys()
 
-      assert.sameDeepMembers(obtainedKeys, [[1], [2], [3]])
+      assert.sameDeepMembers(obtainedKeys, [
+        [1],
+        [2],
+        [3],
+      ])
     })
   })
   describe('delete', () => {

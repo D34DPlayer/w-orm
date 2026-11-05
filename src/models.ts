@@ -1,9 +1,9 @@
-import type { Filter, ForEachCallback, OrderBy } from './types'
-import { TablesMetadata, getPrimaryKeys } from './metadata'
-import { _objectStore } from './transaction'
 import type { BetweenFilter } from './query'
-import { Query } from './query'
+import type { Filter, ForEachCallback, OrderBy } from './types'
 import { ModelError } from './errors'
+import { getPrimaryKeys, TablesMetadata } from './metadata'
+import { Query } from './query'
+import { _objectStore } from './transaction'
 
 /**
  * Base class for all models.
@@ -13,8 +13,9 @@ import { ModelError } from './errors'
  * @see {@link Query} for more information about querying the database
  *
  * @example
- * Create a new model:
  * ```ts
+ * // Create a new model:
+ *
  * import { Model, Field } from '@d34d/w-orm'
  *
  * class NewTable extends Model {
@@ -23,9 +24,9 @@ import { ModelError } from './errors'
  *  @Field()
  *  name: string
  * }
- * ```
- * Query the database:
- * ```ts
+ *
+ * // Query the database:
+ *
  * // Get with primary key
  * const table = await NewTable.get(1)
  * // Get all
@@ -52,7 +53,7 @@ export abstract class Model implements Record<string, any> {
    * @returns - The new model instance
    */
   public static async create<T extends Model>(
-    this: { new (): T },
+    this: new () => T,
     values: Partial<T>,
     tx?: IDBTransaction,
   ): Promise<T> {
@@ -69,7 +70,7 @@ export abstract class Model implements Record<string, any> {
         // Check if field has a default value
         if (fieldOpts.default !== undefined && fieldOpts.default !== null) {
           // Check if default value is a generator
-          if (fieldOpts.default instanceof Function)
+          if (typeof fieldOpts.default === 'function')
             instance[field as keyof T] = fieldOpts.default() as T[keyof T]
           else instance[field as keyof T] = fieldOpts.default as T[keyof T]
         }
@@ -99,13 +100,15 @@ export abstract class Model implements Record<string, any> {
    * @returns - The model instance or null if not found
    */
   public static async get<T extends Model>(
-    this: { new (): T },
+    this: new () => T,
     key: IDBValidKey,
     tx?: IDBTransaction,
   ): Promise<T | null> {
     const store = _objectStore(this.name, tx)
     return new Promise((resolve, reject) => {
-      const request = store.get(Array.isArray(key) ? key : [key])
+      const request = store.get(Array.isArray(key)
+        ? key
+        : [key])
       request.onerror = (_) => {
         reject(request.error)
       }
@@ -127,7 +130,7 @@ export abstract class Model implements Record<string, any> {
    * @returns - The model instances
    */
   public static async all<T extends Model>(
-    this: { new (): T },
+    this: new () => T,
     tx?: IDBTransaction,
   ): Promise<T[]> {
     return new Query(this).all(tx)
@@ -151,7 +154,7 @@ export abstract class Model implements Record<string, any> {
    * ```
    */
   public static async forEach<T extends Model>(
-    this: { new (): T },
+    this: new () => T,
     callback: ForEachCallback<T>,
     tx?: IDBTransaction,
   ): Promise<void> {
@@ -163,7 +166,7 @@ export abstract class Model implements Record<string, any> {
    * @returns - The number of model instances
    */
   public static async count<T extends Model>(
-    this: { new (): T },
+    this: new () => T,
     tx?: IDBTransaction,
   ): Promise<number> {
     return new Promise<number>((resolve, reject) => {
@@ -186,7 +189,7 @@ export abstract class Model implements Record<string, any> {
    * @returns - The new query
    */
   public static filter<T extends Model>(
-    this: { new (): T },
+    this: new () => T,
     filters: Filter<T>,
   ): Query<T> {
     return new Query(this).filter(filters)
@@ -200,7 +203,7 @@ export abstract class Model implements Record<string, any> {
    * @returns - The new query
    */
   public static orderBy<T extends Model>(
-    this: { new (): T },
+    this: new () => T,
     orderBy: OrderBy<T>,
   ): Query<T> {
     return new Query(this).orderBy(orderBy)
@@ -215,7 +218,7 @@ export abstract class Model implements Record<string, any> {
    * @returns - The new query
    */
   public static withIndex<T extends Model>(
-    this: { new (): T },
+    this: new () => T,
     index: string,
     query: BetweenFilter<unknown>,
   ): Query<T> {

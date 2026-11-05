@@ -2,7 +2,7 @@ import { assert, describe, it } from 'vitest'
 
 import { db, deleteDB, disconnect, init } from '../src/connection'
 
-describe('DB Tests', () => {
+describe('dB Tests', () => {
   it('should be disconnected by default', () => {
     assert(!db.connected)
   })
@@ -24,7 +24,7 @@ describe('DB Tests', () => {
   })
 })
 
-describe('Migrations', () => {
+describe('migrations', () => {
   it('should only happen when asked', async () => {
     const databases = await globalThis.indexedDB.databases()
     assert.lengthOf(databases, 0)
@@ -42,7 +42,7 @@ describe('Migrations', () => {
   })
 })
 
-describe('Delete DB', () => {
+describe('delete DB', () => {
   it('should delete the database', async () => {
     await init('test', 1)
     disconnect()

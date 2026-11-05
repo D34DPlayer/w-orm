@@ -1,8 +1,9 @@
 /**
  * @module Types
  */
-import type { Model } from './models'
+
 import type { MigrationContext } from './migration'
+import type { Model } from './models'
 import type { BetweenFilter } from './query'
 
 export type DisconnectedDB = {
@@ -55,10 +56,10 @@ export type ModelFieldKey<T extends Model> = string & keyof ModelFields<T>
 
 export type Filter<T extends Model> = {
   [P in keyof T]?:
-  | T[P]
-  | BetweenFilter<T[P]>
-  | ((instance: T[P]) => boolean)
-  | undefined;
+    | T[P]
+    | BetweenFilter<T[P]>
+    | ((instance: T[P]) => boolean)
+    | undefined;
 }
 
 export type SimpleFilter<T extends Model> = {
@@ -66,9 +67,9 @@ export type SimpleFilter<T extends Model> = {
   value: unknown
 }
 
-export type OrderBy<T extends Model> =
-  | ModelFieldKey<T>
-  | `-${ModelFieldKey<T>}`
+export type OrderBy<T extends Model>
+  = | ModelFieldKey<T>
+    | `-${ModelFieldKey<T>}`
 
 export type TransactionCallback<T> = (tx: IDBTransaction) => Promise<T>
 
@@ -86,6 +87,7 @@ export type ForEachCallback<T> = (
 
 export type TableDefinition = Record<string, Partial<FieldOptions<unknown>>>
 
+// eslint-disable-next-line ts/no-unsafe-function-type
 export type Constructor<T> = Function & { prototype: T }
 
 export type Migration = (migration: MigrationContext) => Promise<void>
@@ -191,7 +193,7 @@ export type MigrationList = Record<number, Migration>
  *
  * // 4th use case, filter + ordering:
  * //  You can combine all this information and use the first field(s) for filtering and leaving the rest for ordering.
-
+ *
  * // Looking for people named John, ordered by age
  * await Test3.withIndex('nameAge', Between(['John', BetweenFilter.minKey], ['John', BetweenFilter.maxKey])).all()
  * ```

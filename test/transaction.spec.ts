@@ -1,11 +1,11 @@
 import { assert, describe, it } from 'vitest'
 
 import { init } from '../src/connection'
-import { Transaction } from '../src/transaction'
 import { Field } from '../src/fields'
 import { Model } from '../src/models'
+import { Transaction } from '../src/transaction'
 
-describe('Transactions', () => {
+describe('transactions', () => {
   it('should be able to create a transaction', async () => {
     class Test extends Model {
       @Field({ primaryKey: true })

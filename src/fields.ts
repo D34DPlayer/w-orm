@@ -1,16 +1,16 @@
+import type { Model } from './models'
 import type {
   Constructor,
   FieldOptions,
   TableDefinition,
   TableOptions,
 } from './types'
+import { ModelError, WormError } from './errors'
 import {
   _addFieldToMetadata,
   _handleTableData,
   _overrideTableData,
 } from './metadata'
-import { ModelError, WormError } from './errors'
-import type { Model } from './models'
 
 /**
  * Describes a field on a model.
@@ -24,7 +24,7 @@ import type { Model } from './models'
  *  - `type`: The type of the field, it is automatically inferred with typescript.
  *  - `index`: Whether the field should be indexed, it is recommended to keep it unless the type isn't indexable (eg. a Blob).
  *
- * @default
+ * @defaultValue
  * ```js
  * {
  *   primaryKey: false,
@@ -53,14 +53,14 @@ import type { Model } from './models'
 export function Field<T>(
   options: Partial<FieldOptions<T>> = {},
 ): PropertyDecorator {
-  return function (object, propertyName) {
-    if (typeof propertyName === 'symbol')
+  return function (target: any, propertyKey: string | symbol) {
+    if (typeof propertyKey === 'symbol')
       throw new WormError('Field decorator doesn\'t support symbols')
 
     // Use "emitDecoratorMetadata" to get the type of the field
     let t: () => T
     try {
-      t = (Reflect.getMetadata('design:type', object, propertyName)
+      t = (Reflect.getMetadata('design:type', target, propertyKey)
         || Object) as () => T
     }
     catch {
@@ -80,8 +80,8 @@ export function Field<T>(
       ...options,
     }
 
-    _handleTableData(object)
-    _addFieldToMetadata(object.constructor.name, propertyName, newOptions)
+    _handleTableData(target)
+    _addFieldToMetadata(target.constructor.name, propertyKey, newOptions)
   }
 }
 
@@ -89,9 +89,8 @@ export function Field<T>(
  * Create a new model from a definition.
  * Allows defining models without using the decorator syntax.
  *
- * @param name - The name of the model
+ * @param modelClass - The class of the model
  * @param definition - The definition of the model
- * @returns - The new model
  *
  * @example
  * ```ts
@@ -109,7 +108,7 @@ export function defineModel<T extends Model>(
   modelClass: Constructor<T>,
   definition: TableDefinition,
   options: TableOptions = {},
-) {
+): void {
   for (const field in definition) {
     const fieldOpts = definition[field]
     Field(fieldOpts)(modelClass.prototype as T, field)
