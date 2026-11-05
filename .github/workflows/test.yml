@@ -8,15 +8,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout src
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8.14.1
+        uses: pnpm/action-setup@v6
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -36,17 +34,18 @@ jobs:
           - 16
           - 18
           - 20
+          - 22
+          - 24
+          - 26
     steps:
       - name: Checkout src
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8.14.1
+        uses: pnpm/action-setup@v6
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v7
         with:
           node-version: '${{ matrix.node }}'
           cache: pnpm
