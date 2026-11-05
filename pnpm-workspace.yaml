@@ -16,4 +16,4 @@ update:
 shellEmulator: true
 
 allowBuilds:
-  simple-git-hooks: set this to true or false
+  simple-git-hooks: true
