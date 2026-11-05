@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: get the gh-pages repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           ref: gh-pages
 
@@ -21,7 +21,7 @@ jobs:
           mkdir -p ./docs
           tar -cvf documentation.tar ./docs
       - name: create a document artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v7
         with:
           name: documentation
           path: documentation.tar
@@ -31,20 +31,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout src
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - run: mkdir -p ./docs
       - name: Download the existing documents artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v8
         with:
           name: documentation
       - run: tar -xf documentation.tar ./docs -C ./docs
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v6
         with:
           version: 7.30.3
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -59,7 +59,7 @@ jobs:
         run: tar -cvf newdocumentation.tar ./docs
 
       - name: create a new document artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v7
         with:
           name: newdocumentation
           path: newdocumentation.tar
@@ -69,13 +69,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout the gh-pages repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           ref: gh-pages
 
       - run: mkdir -p ./docs
       - name: Download the new documents artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v8
         with:
           name: newdocumentation
       - run: tar -xf newdocumentation.tar ./docs -C ./docs
