@@ -2,7 +2,7 @@
   "name": "@d34d/w-orm",
   "type": "module",
   "version": "0.5.0",
-  "packageManager": "pnpm@11.28.11",
+  "packageManager": "pnpm@12.17.0",
   "description": "IndexedDB ORM",
   "author": {
     "name": "D34DPlayer",
@@ -79,8 +79,7 @@
     "unplugin-dts": "^1.1.2",
     "vite": "^8.3",
     "vite-plugin-checker": "^0.14.5",
-    "vitest": "^5.1.0",
-    "webdriverio": "^10.1.0"
+    "vitest": "^5.1.0"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged"
